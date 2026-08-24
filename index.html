@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema JK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; min-height: 100vh; color: #fff; background: radial-gradient(circle at top left, #12353a 0%, #0d1117 40%, #090b10 100%); }
+.container { width: 100%; max-width: 1250px; margin: auto; padding: 30px; }
+
+/* HEADER & TITULO */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 35px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #12d8c4; color: #101319; font-weight: 700; box-shadow: 0 0 22px rgba(18,216,196,.2); }
+.brand h1 { font-size: 20px; font-weight: 600; }
+.brand span { color: #7d8594; font-size: 11px; }
+.user { display: flex; align-items: center; gap: 12px; }
+.user-info { text-align: right; }
+.user-info strong { display: block; font-size: 13px; }
+.user-info span { color: #7d8594; font-size: 11px; }
+.user-info .estado-taller-btn {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #ff5e5e;
+    background: rgba(255,94,94,.12);
+    border: 1px solid rgba(255,94,94,.35);
+    cursor: pointer;
+    text-decoration: none;
+    transition: .2s;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: .3px;
+}
+.user-info .estado-taller-btn:hover { background: rgba(255,94,94,.25); border-color: #ff5e5e; }
+.avatar { width: 47px; height: 47px; border-radius: 60%; display: flex; align-items: center; justify-content: center; background: transparent; color: #101319; font-weight: 700; overflow: visible; }
+.avatar img { width: 100%; height: 100%; border-radius: 0%; object-fit: contain; display: block; transform: translateX(10px); margin-left: 5px; }
+.title { margin-bottom: 28px; text-align: center; }
+.title h2 { font-size: 27px; font-weight: 600; }
+.title p { color: #7d8594; font-size: 13px; margin-top: 6px; }
+
+/* TARJETAS VERTICALES EN FILA DE TRES */
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 840px; margin: 0 auto 25px; }
+.card { min-width: 0; padding: 28px 18px 24px; border-radius: 18px; border: 1px solid rgba(18,216,196,.10); background: #171a21; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; transition: transform .3s cubic-bezier(.22,1,.36,1), border-color .3s, box-shadow .3s; text-align: center; animation: cardIn .6s cubic-bezier(.22,1,.36,1) both; }
+.card:nth-child(1) { animation-delay: .05s; }
+.card:nth-child(2) { animation-delay: .15s; }
+.card:nth-child(3) { animation-delay: .25s; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.card:hover { transform: translateY(-5px); border-color: rgba(18,216,196,.45); box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+.card.active { border-color: #12d8c4; background: linear-gradient(160deg, #1a2027, #151a20); box-shadow: 0 0 30px rgba(18,216,196,.15); }
+.card .icon { width: 60px; height: 60px; flex-shrink: 0; margin: 0; border-radius: 17px; display: flex; align-items: center; justify-content: center; background: rgba(18,216,196,.09); color: #12d8c4; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+.card:hover .icon { transform: scale(1.08) rotate(-4deg); }
+.card .icon i { font-size: 26px; color: #12d8c4; }
+.card-text { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.card h3 { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.2; }
+.card p { color: #7d8594; font-size: 11.5px; margin: 0; line-height: 1.35; }
+
+/* FORMULARIOS */
+.form { display: none; padding: 28px; border-radius: 20px; border: 1px solid rgba(18,216,196,.10); background: #171a21; }
+.form.active { display: block; }
+.form-header { display: flex; align-items: center; gap: 14px; padding-bottom: 20px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.form-icon { width: 46px; height: 46px; flex-shrink: 0; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #12d8c4; background: rgba(18,216,196,.10); }
+.form-icon i { font-size: 20px; color: #12d8c4; }
+.form-header h3 { font-size: 19px; }
+.form-header p { margin-top: 3px; color: #7d8594; font-size: 11px; }
+
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.field { display: flex; flex-direction: column; }
+.field.full { grid-column: 1 / -1; }
+label { color: #bfc6d2; font-size: 12px; margin-bottom: 8px; }
+
+input, select, textarea { width: 100%; border: 1px solid rgba(255,255,255,.06); outline: none; border-radius: 12px; background: #101319; color: #fff; padding: 0 14px; font-family: 'Poppins', sans-serif; font-size: 13px; transition: .2s; }
+input, select { height: 48px; }
+textarea { min-height: 110px; padding: 13px 14px; resize: vertical; }
+input:focus, select:focus, textarea:focus { border-color: #12d8c4; box-shadow: 0 0 15px rgba(18,216,196,.1); }
+select option { background: #171a21; }
+
+/* MODALES DE FORMULARIOS ANIMADOS */
+.form-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(6,9,14,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s ease, visibility .35s ease; }
+.form-modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
+.form-modal-content { position: relative; width: 100%; max-width: 780px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 22px; border: 1px solid rgba(18,216,196,.16); background: #171a21; box-shadow: 0 30px 90px rgba(0,0,0,.65), 0 0 50px rgba(18,216,196,.06); opacity: 0; transform: translateY(48px) scale(.93); transition: transform .55s cubic-bezier(.22,1.32,.36,1), opacity .38s ease; }
+.form-modal.show .form-modal-content { opacity: 1; transform: translateY(0) scale(1); }
+.form-modal-content::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 22px 22px 0 0; background: linear-gradient(90deg, transparent, #12d8c4, #22f5dd, #12d8c4, transparent); opacity: .8; z-index: 2; }
+.form-modal-content::-webkit-scrollbar { width: 7px; }
+.form-modal-content::-webkit-scrollbar-track { background: transparent; }
+.form-modal-content::-webkit-scrollbar-thumb { background: rgba(18,216,196,.25); border-radius: 10px; }
+.modal-close { position: absolute; top: 14px; right: 14px; z-index: 6; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); color: #bfc6d2; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .3s cubic-bezier(.34,1.56,.64,1); }
+.modal-close:hover { background: rgba(255,94,94,.16); border-color: rgba(255,94,94,.55); color: #ff5e5e; transform: rotate(90deg) scale(1.08); }
+
+/* Formulario dentro del modal */
+.form-modal .form { display: block; border: 0; background: transparent; border-radius: 0; padding: 32px 30px 28px; }
+
+/* Animacion escalonada del contenido del modal */
+@keyframes modalItemIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.form-modal.show .form-header { animation: modalItemIn .6s .10s cubic-bezier(.22,1,.36,1) both; }
+.form-modal.show .grid { animation: modalItemIn .6s .20s cubic-bezier(.22,1,.36,1) both; }
+.form-modal.show .total-box { animation: modalItemIn .6s .30s cubic-bezier(.22,1,.36,1) both; }
+.form-modal.show .secondary-bill { animation: modalItemIn .6s .36s cubic-bezier(.22,1,.36,1) both; }
+.form-modal.show .submit { animation: modalItemIn .6s .42s cubic-bezier(.22,1,.36,1) both; }
+
+/* AUTOCOMPLETADO */
+.autocomplete-wrapper { position: relative; width: 100%; }
+.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #171a21; border: 1px solid #12d8c4; border-radius: 12px; margin-top: 5px; max-height: 220px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+.autocomplete-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; transition: .2s; }
+.autocomplete-item:hover { background: rgba(18,216,196,.15); padding-left: 20px; }
+.autocomplete-item div { display: flex; flex-direction: column; }
+.autocomplete-item strong { color: #fff; font-size: 13px; margin-bottom: 2px; }
+.autocomplete-item span { color: #12d8c4; font-size: 13px; font-weight: 700; }
+.autocomplete-item small { color: #7d8594; font-size: 11px; }
+.autocomplete-list::-webkit-scrollbar { width: 6px; }
+.autocomplete-list::-webkit-scrollbar-thumb { background: rgba(18,216,196,.3); border-radius: 10px; }
+
+/* EVIDENCIA */
+.evidence { min-height: 160px; padding: 20px; border-radius: 14px; border: 1px dashed rgba(18,216,196,.24); background: rgba(18,216,196,.025); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
+.camera { padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(18,216,196,.25); background: rgba(18,216,196,.08); color: #12d8c4; font-family: 'Poppins', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.preview { width: 180px; height: 90px; border: 1px dashed rgba(18,216,196,.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #596170; font-size: 11px; overflow: hidden; }
+.preview img { width: 100%; height: 100%; object-fit: cover; }
+
+/* TOTALES */
+.total-box { margin-top: 25px; padding: 17px 20px; border-radius: 15px; border: 1px solid rgba(18,216,196,.11); background: #101319; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+.total-item { display: flex; flex-direction: column; }
+.total-item span { color: #8d95a5; font-size: 12px; }
+.total-item strong { color: #12d8c4; font-size: 22px; }
+.total-item.pendiente strong { color: #ff5e5e; }
+
+/* BOTONES */
+.submit { width: 100%; height: 54px; margin-top: 22px; border: 0; border-radius: 14px; background: linear-gradient(135deg, #12d8c4, #22f5dd); color: #081014; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: .25s; }
+.submit:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(18,216,196,.22); }
+.secondary-bill { width: 100%; height: 48px; margin-top: 15px; border-radius: 14px; border: 1px solid rgba(18,216,196,.4); background: rgba(18,216,196,.12); color: #12d8c4; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: .25s; }
+
+/* MODAL Y PDF */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 3000; padding: 20px; }
+.modal-content { background: #171a21; border: 1px solid rgba(18,216,196,.3); border-radius: 18px; padding: 25px; max-width: 450px; width: 100%; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.modal-content h3 { font-size: 20px; margin-bottom: 8px; color: #12d8c4; }
+.resumen-box { background: #101319; border: 1px solid rgba(18,216,196,.2); border-radius: 10px; padding: 15px; font-size: 12px; line-height: 1.6; max-height: 250px; overflow-y: auto; margin-bottom: 20px; color: #bfc6d2; }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+.btn-option { width: 100%; height: 44px; border: 0; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-pdf { background: #ff4757; color: #fff; }
+.btn-whatsapp { background: #25D366; color: #000; }
+.btn-cerrar { background: rgba(255,255,255,.1); color: #ccc; }
+
+.pdf-container { width: 100%; max-width: 750px; margin: 0 auto; background: #ffffff !important; color: #000000 !important; font-family: Arial, sans-serif; padding: 20px; box-sizing: border-box; }
+.pdf-header { text-align: center; border-bottom: 2px solid #12d8c4; padding-bottom: 20px; margin-bottom: 20px; }
+.pdf-header h1 { margin: 0; font-size: 28px; color: #000; text-transform: uppercase; }
+.pdf-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
+.pdf-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 30px; }
+.pdf-table th, .pdf-table td { border: 1px solid #ddd; padding: 12px; text-align: left; font-size: 14px;}
+.pdf-totals { width: 50%; float: right; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+.pdf-totals div { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;}
+.pdf-totals div.neto { font-weight: bold; border-top: 1px solid #ccc; padding-top: 8px; font-size: 16px;}
+.pdf-garantia { clear: both; margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; font-size: 11px; color: #444; text-align: justify; line-height: 1.4; }
+.pdf-signatures { clear: both; margin-top: 50px; display: flex; justify-content: space-between; }
+.signature-box { width: 40%; text-align: center; border-top: 1px solid #000; padding-top: 10px; font-size: 14px; }
+
+select.estado-taller-select { 
+    background: #101319; border: 1px solid rgba(255,255,255,.06); color: #fff; height: 48px; border-radius: 12px; padding: 0 14px; font-family: 'Poppins', sans-serif; font-size: 13px; width: 100%; cursor: pointer;
+}
+select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
+
+@media(max-width: 700px) {
+    .container { padding: 22px 14px; }
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 100%; }
+    .card { padding: 18px 8px 16px; gap: 10px; border-radius: 15px; }
+    .card .icon { width: 44px; height: 44px; border-radius: 13px; }
+    .card .icon i { font-size: 18px; }
+    .card h3 { font-size: 12px; }
+    .card p { font-size: 9.5px; }
+    .grid { grid-template-columns: 1fr; }
+    .field.full { grid-column: auto; }
+    .form-modal { padding: 10px; }
+    .form-modal-content { max-height: 94vh; border-radius: 18px; }
+    .form-modal .form { padding: 28px 18px 20px; }
+    .modal-close { top: 10px; right: 10px; width: 34px; height: 34px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <div class="brand">
+            <div class="logo">JK</div>
+            <div><h1>Sistema JK</h1><span>ERP Empresarial</span></div>
+        </div>
+        <div class="user">
+            <div class="user-info">
+                <strong>Usuario</strong>
+                <span>Vendedor</span>
+                <!-- MODIFICADO: navegacion interna de la app (ya no saca a enlace externo) -->
+                <a class="estado-taller-btn" data-offline="false" data-params="value_id:288129" data-state="sourcecode-view"><i class="fa-solid fa-list-check"></i> Estado Taller</a>
+            </div>
+            <div class="avatar"><img src="https://i.imgur.com/SC6JNcp.gif" alt="Usuario"></div>
+        </div>
+    </header>
+
+    <div class="title">
+        <h2>Registrar operación</h2>
+        <p>Selecciona el tipo de operación que deseas registrar.</p>
+    </div>
+
+    <!-- TARJETAS VERTICALES EN FILA DE TRES -->
+    <div class="cards">
+        <div class="card" data-form="form_accesorio">
+            <div class="icon"><i class="fa-solid fa-headphones"></i></div>
+            <div class="card-text"><h3>Accesorio</h3><p>Registrar venta</p></div>
+        </div>
+        <div class="card" data-form="form_celular">
+            <div class="icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <div class="card-text"><h3>Celular</h3><p>Registrar venta</p></div>
+        </div>
+        <div class="card" data-form="form_reparacion">
+            <div class="icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+            <div class="card-text"><h3>Reparación</h3><p>Ingreso de equipo</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ANIMADO: FORMULARIO ACCESORIO -->
+<div class="form-modal" id="modal_accesorio">
+    <div class="form-modal-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_accesorio')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <form class="form active" id="form_accesorio" onsubmit="event.preventDefault(); guardarOperacion('acc', 'Accesorio');">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-headphones"></i></div>
+                <div><h3>Registrar accesorio</h3><p>Registra la venta conectada al inventario.</p></div>
+            </div>
+            <div class="grid">
+                <div class="field full">
+                    <label>Producto (Buscar en Inventario) <i class="fa-solid fa-magnifying-glass" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="acc_producto" autocomplete="off" placeholder="Escribe el nombre del accesorio..." required oninput="appCore.buscarEnInventario(this, 'Accesorio', 'lista_acc', 'acc')">
+                        <div id="lista_acc" class="autocomplete-list"></div>
+                    </div>
+                </div>
+                <div class="field"><label>Cantidad</label><input type="number" id="acc_cantidad" value="1" min="1" required oninput="appCore.actualizarTotales('acc')"></div>
+                <div class="field"><label>IMEI / Serial</label><input type="text" id="acc_imei"></div>
+                <div class="field"><label>Precio Unitario</label><input type="number" id="acc_precio" required oninput="appCore.actualizarTotales('acc')"></div>
+                <div class="field"><label>Cliente</label><input type="text" id="acc_cliente" required></div>
+                <div class="field"><label>Teléfono</label><input type="tel" id="acc_telefono"></div>
+                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="acc_asesor" required></div>
+                <div class="field"><label>Método de pago</label><select id="acc_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option></select></div>
+                <div class="field"><label>Tipo de pago</label><select id="acc_tipo_pago" required onchange="appCore.toggleAbono('acc')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
+                <div class="field full" id="div_acc_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="acc_abono" oninput="appCore.actualizarTotales('acc')"></div>
+                <div class="field full">
+                    <label>Evidencia</label>
+                    <div class="evidence">
+                        <input type="file" id="acc_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc')">
+                        <button type="button" class="camera" onclick="document.getElementById('acc_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
+                        <div class="preview" id="preview_acc">Vista previa</div>
+                    </div>
+                </div>
+            </div>
+            <div class="total-box">
+                <div class="total-item"><span>Total Operación</span><strong id="tot_acc_general">$0</strong></div>
+                <div class="total-item pendiente"><span>Saldo Pendiente</span><strong id="tot_acc_pendiente">$0</strong></div>
+            </div>
+            <button type="button" class="secondary-bill" onclick="appCore.prepararFactura('acc')"><i class="fa-solid fa-file-invoice"></i> Crear Factura</button>
+            <button type="submit" class="submit">Registrar Venta</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ANIMADO: FORMULARIO CELULAR -->
+<div class="form-modal" id="modal_celular">
+    <div class="form-modal-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_celular')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <form class="form" id="form_celular" onsubmit="event.preventDefault(); guardarOperacion('cel', 'Celular');">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                <div><h3>Registrar celular</h3><p>Registra la venta del equipo desde el inventario.</p></div>
+            </div>
+            <div class="grid">
+                <div class="field">
+                    <label>Marca y modelo (Buscar en Inventario) <i class="fa-solid fa-magnifying-glass" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="cel_modelo" autocomplete="off" placeholder="Escribe la marca/modelo..." required oninput="appCore.buscarEnInventario(this, 'Celular', 'lista_cel', 'cel')">
+                        <div id="lista_cel" class="autocomplete-list"></div>
+                    </div>
+                </div>
+                <div class="field"><label>Cantidad</label><input type="number" id="cel_cantidad" value="1" min="1" required oninput="appCore.actualizarTotales('cel')"></div>
+                <div class="field"><label>IMEI / Serial 1</label><input type="text" id="cel_imei" required></div>
+                <div class="field"><label>IMEI / Serial 2</label><input type="text" id="cel_imei2"></div>
+                <div class="field"><label>Precio Unitario</label><input type="number" id="cel_precio" required oninput="appCore.actualizarTotales('cel')"></div>
+                <div class="field"><label>Cliente</label><input type="text" id="cel_cliente" required></div>
+                <div class="field"><label>Teléfono</label><input type="tel" id="cel_telefono"></div>
+                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="cel_asesor" required></div>
+                <div class="field"><label>Método de pago</label><select id="cel_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
+                <div class="field"><label>Tipo de pago</label><select id="cel_tipo_pago" required onchange="appCore.toggleAbono('cel')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
+                <div class="field full" id="div_cel_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="cel_abono" oninput="appCore.actualizarTotales('cel')"></div>
+                <div class="field full">
+                    <label>Evidencia</label>
+                    <div class="evidence">
+                        <input type="file" id="cel_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_cel')">
+                        <button type="button" class="camera" onclick="document.getElementById('cel_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
+                        <div class="preview" id="preview_cel">Vista previa</div>
+                    </div>
+                </div>
+            </div>
+            <div class="total-box"><div class="total-item"><span>Total Operación</span><strong id="tot_cel_general">$0</strong></div><div class="total-item pendiente"><span>Saldo Pendiente</span><strong id="tot_cel_pendiente">$0</strong></div></div>
+            <button type="button" class="secondary-bill" onclick="appCore.prepararFactura('cel')"><i class="fa-solid fa-file-invoice"></i> Crear Factura</button>
+            <button type="submit" class="submit">Registrar Venta</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ANIMADO: FORMULARIO REPARACION -->
+<div class="form-modal" id="modal_reparacion">
+    <div class="form-modal-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_reparacion')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <form class="form" id="form_reparacion" onsubmit="event.preventDefault(); guardarOperacion('rep', 'Reparacion');">
+            <div class="form-header"><div class="form-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div><div><h3>Registrar reparación</h3><p>Registra el ingreso del equipo.</p></div></div>
+            <div class="grid">
+                <div class="field"><label>Equipo (Marca/Modelo)</label><input type="text" id="rep_equipo" required></div>
+                <div class="field"><label>IMEI / Serial</label><input type="text" id="rep_imei" required></div>
+                <div class="field full"><label>Descripción de la falla</label><textarea id="rep_falla" required></textarea></div>
+                <div class="field full">
+                    <label>Estado del Taller</label>
+                    <select id="rep_estado_taller" class="estado-taller-select">
+                        <option value="Pendiente">⏳ Pendiente de Revisión</option>
+                        <option value="En Proceso">⚙ En Proceso / Esperando Repuesto</option>
+                        <option value="Listo">✅ Listo para Entrega</option>
+                    </select>
+                </div>
+                <div class="field"><label>Valor de Reparación</label><input type="number" id="rep_precio" required oninput="appCore.actualizarTotales('rep')"></div>
+                <div class="field"><label>Cliente</label><input type="text" id="rep_cliente" required></div>
+                <div class="field"><label>Teléfono</label><input type="tel" id="rep_telefono"></div>
+                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="rep_asesor" required></div>
+                <div class="field"><label>Método de pago</label><select id="rep_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
+                <div class="field"><label>Tipo de pago</label><select id="rep_tipo_pago" required onchange="appCore.toggleAbono('rep')"><option value="Completo">Pago completo (100%)</option><option value="Abono">Dejar Abono (Anticipo)</option></select></div>
+                <div class="field full" id="div_rep_abono" style="display: none;"><label>Valor del Anticipo / Abono</label><input type="number" id="rep_abono" oninput="appCore.actualizarTotales('rep')"></div>
+                <div class="field full">
+                    <label>Evidencia</label>
+                    <div class="evidence">
+                        <input type="file" id="rep_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_rep')">
+                        <button type="button" class="camera" onclick="document.getElementById('rep_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
+                        <div class="preview" id="preview_rep">Vista previa</div>
+                    </div>
+                </div>
+            </div>
+            <div class="total-box"><div class="total-item"><span>Costo Total</span><strong id="tot_rep_general">$0</strong></div><div class="total-item pendiente"><span>Saldo Pendiente</span><strong id="tot_rep_pendiente">$0</strong></div></div>
+            <button type="button" class="secondary-bill" onclick="appCore.prepararFactura('rep')"><i class="fa-solid fa-file-invoice"></i> Crear Factura</button>
+            <button type="submit" class="submit">Registrar reparación</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL Y PDF -->
+<div id="modalFactura" class="modal-overlay"><div class="modal-content"><h3><i class="fa-solid fa-file-invoice"></i> Acciones de Factura</h3><p>Selecciona cómo deseas generar o enviar el comprobante:</p><div id="resumenFactura" class="resumen-box">Cargando datos...</div><div class="modal-buttons"><button type="button" class="btn-option btn-pdf" onclick="appCore.descargarPDF()"><i class="fa-solid fa-file-pdf"></i> Imprimir / Guardar PDF Blanco</button><button type="button" class="btn-option btn-whatsapp" onclick="appCore.enviarPorWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Enviar Texto por WhatsApp</button><button type="button" class="btn-option btn-cerrar" onclick="document.getElementById('modalFactura').style.display='none'"><i class="fa-solid fa-xmark"></i> Cancelar</button></div></div></div>
+
+<div class="pdf-container" id="pdf-invoice">
+    <div class="pdf-header"><h1>ACCESORIOS JK</h1><p>NIT:1005715210 Comprobante de Operación Comercial REGIMEN SIMPLIFICADO</p></div>
+    <div class="pdf-row"><div><strong>Cliente:</strong> <span id="pdf-cliente"></span></div><div><strong>Fecha:</strong> <span id="pdf-fecha"></span></div></div>
+    <div class="pdf-row"><div><strong>Teléfono:</strong> <span id="pdf-telefono"></span></div><div><strong>Factura N°:</strong> <span id="pdf-numero"></span></div></div>
+    <table class="pdf-table"><thead><tr><th>Descripción</th><th>Cant</th><th>V. Unitario</th><th>Total</th></tr></thead><tbody><tr><td id="pdf-desc"></td><td id="pdf-cant"></td><td id="pdf-vunit"></td><td id="pdf-vtotal"></td></tr></tbody></table>
+    <div class="pdf-totals"><div><span>Subtotal:</span><span id="pdf-subtotal"></span></div><div><span>Tipo de Pago:</span><span id="pdf-tipopago"></span></div><div><span>Valor Abonado:</span><span id="pdf-abono"></span></div><div class="neto"><span>SALDO PENDIENTE:</span><span id="pdf-pendiente"></span></div></div>
+    <div class="pdf-garantia"><p><strong>TÉRMINOS DE GARANTÍA:</strong> La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.</p><div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>DIRECCIÓN:</strong> Calle 14 # 2-67 Centro Ibagué-Tolima | <strong>SERVICIOS:</strong> Técnico profesional y telefonía.</div></div>
+    <div class="pdf-signatures"><div class="signature-box">Recibí Conforme<br><br><span id="pdf-firma-cliente"></span></div><div class="signature-box">Autorizado<br><br>ACCESORIOS JK</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.jkSupabase = window.jkSupabase || window.supabase.createClient(
+    "https://scippqgodwvbopslwxdf.supabase.co",
+    "sb_publishable_sakCK5FcUzB3ZmfwNKt4cw_AJi2Nw95"
+);
+
+const NOMBRE_TABLA = 'operaciones';
+let datosFacturaActual = {};
+const PREFIJO_FACTURA = "JK/";
+
+// Lógica de Navegación (Cards -> Abren modales animados independientes)
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.card').forEach(item => item.classList.remove('active'));
+        card.classList.add('active');
+        const targetId = card.dataset.form;
+        const modalId = targetId.replace('form_', 'modal_');
+        abrirModalFormulario(modalId);
+    });
+});
+
+function abrirModalFormulario(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalFormulario(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('show');
+    if (!document.querySelector('.form-modal.show')) { document.body.style.overflow = ''; }
+}
+
+// Cerrar modal al hacer clic en el fondo oscuro
+document.querySelectorAll('.form-modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) cerrarModalFormulario(modal.id);
+    });
+});
+
+// Cerrar modal con la tecla Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.form-modal.show').forEach(m => cerrarModalFormulario(m.id));
+    }
+});
+
+// Cerrar listas de autocompletado si se hace clic afuera
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.autocomplete-wrapper')) {
+        document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none');
+    }
+});
+
+async function obtenerSiguienteNumeroFactura() {
+    try {
+        const { data } = await window.jkSupabase.from(NOMBRE_TABLA).select('numero_factura').not('numero_factura', 'is', null).order('id', { ascending: false }).limit(1);
+        let siguienteNumero = 1;
+        if (data && data.length > 0 && data[0].numero_factura) {
+            const partes = data[0].numero_factura.split('/');
+            if (partes.length > 1) {
+                const ultimoNum = parseInt(partes[partes.length - 1], 10);
+                if (!isNaN(ultimoNum)) siguienteNumero = ultimoNum + 1;
+            }
+        }
+        return `${PREFIJO_FACTURA}${siguienteNumero.toString().padStart(2, '0')}`;
+    } catch (e) { return `${PREFIJO_FACTURA}01`; }
+}
+
+async function subirImagenSupabase(inputFile) {
+    if (!inputFile || !inputFile.files || !inputFile.files[0]) return null;
+    const archivo = inputFile.files[0];
+    const nombreArchivo = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${archivo.name.split('.').pop()}`;
+    const { error } = await window.jkSupabase.storage.from('evidencias').upload(nombreArchivo, archivo);
+    if (error) return null;
+    const { data: publicUrlData } = window.jkSupabase.storage.from('evidencias').getPublicUrl(nombreArchivo);
+    return publicUrlData.publicUrl;
+}
+
+const appCore = {
+    formatoMoneda: (num) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(num),
+    
+    buscarEnInventario: async (input, categoria, listaId, prefijo) => {
+        const textoBusqueda = input.value.trim();
+        const lista = document.getElementById(listaId);
+        if (textoBusqueda.length < 2) { lista.style.display = 'none'; return; }
+        const { data, error } = await window.jkSupabase.from('inventario').select('*').eq('categoria', categoria).ilike('nombre', `%${textoBusqueda}%`).gt('stock', 0).limit(5);
+        if (error || !data || data.length === 0) {
+            lista.innerHTML = '<div style="padding: 10px 15px; color:#7d8594; font-size:12px;">No se encontraron productos en stock.</div>';
+            lista.style.display = 'block'; return;
+        }
+        lista.innerHTML = '';
+        data.forEach(prod => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.innerHTML = `<div><strong>${prod.nombre}</strong><small><i class="fa-solid fa-box"></i> Stock: ${prod.stock} | SKU: ${prod.sku || 'N/A'}</small></div><span>${appCore.formatoMoneda(prod.precio_venta)}</span>`;
+            div.onclick = () => {
+                input.value = prod.nombre;
+                input.dataset.idInventario = prod.id;
+                document.getElementById(`${prefijo}_precio`).value = prod.precio_venta;
+                lista.style.display = 'none';
+                appCore.actualizarTotales(prefijo);
+            };
+            lista.appendChild(div);
+        });
+        lista.style.display = 'block';
+    },
+
+    toggleAbono: (prefijo) => {
+        const tipo = document.getElementById(`${prefijo}_tipo_pago`).value;
+        const divAbono = document.getElementById(`div_${prefijo}_abono`);
+        const inputAbono = document.getElementById(`${prefijo}_abono`);
+        if (tipo === 'Abono') { divAbono.style.display = 'block'; } 
+        else { divAbono.style.display = 'none'; inputAbono.value = ''; }
+        appCore.actualizarTotales(prefijo);
+    },
+
+    actualizarTotales: (prefijo) => {
+        const precio = parseFloat(document.getElementById(`${prefijo}_precio`)?.value) || 0;
+        const cant = parseFloat(document.getElementById(`${prefijo}_cantidad`)?.value) || 1;
+        const tipoPago = document.getElementById(`${prefijo}_tipo_pago`).value;
+        let abono = parseFloat(document.getElementById(`${prefijo}_abono`)?.value) || 0;
+        const total = precio * cant;
+        let pendiente = 0;
+        if(tipoPago === 'Abono') { pendiente = total - abono; if(pendiente < 0) pendiente = 0; }
+        document.getElementById(`tot_${prefijo}_general`).innerText = appCore.formatoMoneda(total);
+        document.getElementById(`tot_${prefijo}_pendiente`).innerText = appCore.formatoMoneda(pendiente);
+    },
+
+    mostrarPreview: (input, previewId) => {
+        const div = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => div.innerHTML = `<img src="${e.target.result}" alt="Evidencia">`;
+            reader.readAsDataURL(input.files[0]);
+        } else { div.innerHTML = "Vista previa"; }
+    },
+
+    prepararFactura: async (prefijo) => {
+        document.getElementById('resumenFactura').innerText = "Generando factura...";
+        document.getElementById('modalFactura').style.display = 'flex';
+        const numFactura = await obtenerSiguienteNumeroFactura();
+        let desc = "", falla = "", precioUnitario = 0, cantidadItems = 1;
+
+        if (prefijo === 'acc') {
+            desc = document.getElementById('acc_producto')?.value || "Accesorio";
+            precioUnitario = parseFloat(document.getElementById('acc_precio')?.value) || 0;
+            cantidadItems = parseFloat(document.getElementById('acc_cantidad')?.value) || 1;
+        } else if (prefijo === 'cel') {
+            desc = document.getElementById('cel_modelo')?.value || "Celular";
+            precioUnitario = parseFloat(document.getElementById('cel_precio')?.value) || 0;
+            cantidadItems = parseFloat(document.getElementById('cel_cantidad')?.value) || 1;
+        } else if (prefijo === 'rep') {
+            desc = "Reparación: " + (document.getElementById('rep_equipo')?.value || "Equipo");
+            falla = document.getElementById('rep_falla')?.value || "";
+            precioUnitario = parseFloat(document.getElementById('rep_precio')?.value) || 0;
+            cantidadItems = 1;
+        }
+
+        const totalOperacion = precioUnitario * cantidadItems;
+        const tipoPago = document.getElementById(`${prefijo}_tipo_pago`)?.value || 'Completo';
+        const abonoInput = parseFloat(document.getElementById(`${prefijo}_abono`)?.value) || 0;
+        const abono = tipoPago === 'Abono' ? abonoInput : totalOperacion;
+        const pendiente = totalOperacion - abono;
+        const cliente = document.getElementById(`${prefijo}_cliente`)?.value || "Consumidor Final";
+        const telefono = document.getElementById(`${prefijo}_telefono`)?.value || "N/A";
+        const asesor = document.getElementById(`${prefijo}_asesor`)?.value || "N/A";
+        const metodoPago = document.getElementById(`${prefijo}_metodo_pago`)?.value || 'N/A';
+        const ahora = new Date();
+        const fechaStr = ahora.toLocaleDateString('es-CO');
+        const horaStr = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+        const tablaCuerpo = document.querySelector('.pdf-table tbody');
+        tablaCuerpo.innerHTML = `<tr><td style="color: #000; text-align: left;">${desc}</td><td style="color: #000; text-align: left;">${cantidadItems}</td><td style="color: #000; text-align: left;">${appCore.formatoMoneda(precioUnitario)}</td><td style="color: #000; text-align: left;">${appCore.formatoMoneda(totalOperacion)}</td></tr>`;
+
+        document.getElementById('pdf-cliente').innerText = cliente;
+        document.getElementById('pdf-telefono').innerText = telefono;
+        document.getElementById('pdf-fecha').innerText = fechaStr;
+        document.getElementById('pdf-numero').innerText = numFactura;
+        document.getElementById('pdf-subtotal').innerText = appCore.formatoMoneda(totalOperacion);
+        document.getElementById('pdf-tipopago').innerText = tipoPago;
+        document.getElementById('pdf-abono').innerText = appCore.formatoMoneda(abono);
+        document.getElementById('pdf-pendiente').innerText = appCore.formatoMoneda(pendiente < 0 ? 0 : pendiente);
+        document.getElementById('pdf-firma-cliente').innerHTML = `${cliente}<br>(Asesor: ${asesor})`;
+
+        let msg = `*ACCESORIOS JK*%0A*NIT:* 1005715210%0A*RÉGIMEN:* SIMPLIFICADO%0A*SERVICIO TÉCNICO Y TELEFONÍA*%0A*DIRECCIÓN:* Calle 114 %232 67 Centro Ibagué - Tolima%0A%0A*COMPROBANTE DE COMPRA*%0A--------------------------------%0A*Comprobante N°:* ${numFactura}%0A*Fecha:* ${fechaStr}%0A*Hora:* ${horaStr}%0A%0A*DATOS DEL CLIENTE:*%0A*Cliente:* ${encodeURIComponent(cliente)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A%0A*DETALLE DE LA OPERACIÓN:*%0A*Equipo:* ${encodeURIComponent(desc.replace("Reparación: ", ""))}%0A`;
+        if (prefijo === 'rep') { msg += `*Descripción de la falla:*%0A${encodeURIComponent(falla)}%0A`; } else { msg += `*Cantidad:* ${cantidadItems}%0A`; }
+        msg += `%0A*TOTAL A PAGAR:* ${appCore.formatoMoneda(totalOperacion)}%0A`;
+        if (tipoPago === 'Abono') { msg += `*Tipo de pago:* Abono%0A*Abono realizado:* ${appCore.formatoMoneda(abono)}%0A*Saldo pendiente:* ${appCore.formatoMoneda(pendiente)}%0A`; } else { msg += `*Tipo de pago:* Pago completo%0A*Total pagado:* ${appCore.formatoMoneda(totalOperacion)}%0A`; }
+        msg += `*Método de pago:* ${encodeURIComponent(metodoPago)}%0A*Nombre de asesor:* ${encodeURIComponent(asesor)}%0A%0A--------------------------------%0A*¡GRACIAS POR SU COMPRA!*%0A%0A*NOTA:*%0A Garantía de 30 días por defectos de fábrica.%0A Debe conservar este ticket y el producto con sellos intactos.`;
+
+        datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/D/g, ''), numeroFactura: numFactura, falla: falla };
+        document.getElementById('resumenFactura').innerText = decodeURIComponent(msg.replace(/%0A/g, 'n'));
+    },
+    descargarPDF: () => {
+        const elemento = document.getElementById('pdf-invoice');
+        const num = document.getElementById('pdf-numero').innerText.replace('/', '-');
+        html2pdf().set({ margin: [0.3, 0.3, 0.3, 0.3], filename: `Factura_JK_${num}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save().then(() => document.getElementById('modalFactura').style.display = 'none');
+    },
+    enviarPorWhatsApp: () => {
+        let num = datosFacturaActual.telefono || "";
+        if (num.length === 10) num = "57" + num;
+        if (!num) return alert("El cliente no tiene un número válido.");
+        window.open(`https://api.whatsapp.com/send?phone=${num}&text=${datosFacturaActual.mensaje}`, "_blank");
+    }
+};
+
+// FUNCIONES DE ALERTA
+function mostrarAlertaExito(mensaje) {
+    const alertasPrevias = document.querySelectorAll('.custom-alert-container');
+    alertasPrevias.forEach(a => a.remove());
+    const alerta = document.createElement('div');
+    alerta.className = 'custom-alert-container';
+    alerta.style.position = 'fixed'; alerta.style.top = '25px'; alerta.style.left = '0'; alerta.style.right = '0'; alerta.style.width = '280px'; alerta.style.margin = '0 auto'; alerta.style.zIndex = '9999999'; alerta.style.boxSizing = 'border-box';
+    alerta.style.background = '#171a21'; alerta.style.border = '2px solid #12d8c4'; alerta.style.borderRadius = '14px'; alerta.style.padding = '16px 20px'; alerta.style.boxShadow = '0 10px 30px rgba(0,0,0,0.85)'; alerta.style.textAlign = 'center';
+    alerta.innerHTML = `<div style="margin-bottom: 10px; display: block;"><i class="fa-solid fa-circle-check" style="color:#12d8c4; font-size: 26px; display: inline-block;"></i></div><div style="display: block; width: 100%;"><p style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; line-height: 1.45; color: #ffffff; margin: 0; padding: 0; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: normal;">${mensaje}</p></div>`;
+    document.body.appendChild(alerta);
+    setTimeout(() => { alerta.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; alerta.style.opacity = '0'; alerta.style.transform = 'translateY(-15px)'; setTimeout(() => { alerta.remove(); }, 400); }, 3200);
+}
+
+function mostrarAlertaError(mensaje) {
+    const alertasPrevias = document.querySelectorAll('.custom-alert-container');
+    alertasPrevias.forEach(a => a.remove());
+    const alerta = document.createElement('div');
+    alerta.className = 'custom-alert-container';
+    alerta.style.position = 'fixed'; alerta.style.top = '25px'; alerta.style.left = '0'; alerta.style.right = '0'; alerta.style.width = '280px'; alerta.style.margin = '0 auto'; alerta.style.zIndex = '9999999'; alerta.style.boxSizing = 'border-box';
+    alerta.style.background = '#171a21'; alerta.style.border = '2px solid #ff5e5e'; alerta.style.borderRadius = '14px'; alerta.style.padding = '16px 20px'; alerta.style.boxShadow = '0 10px 30px rgba(0,0,0,0.85)'; alerta.style.textAlign = 'center';
+    alerta.innerHTML = `<div style="margin-bottom: 10px; display: block;"><i class="fa-solid fa-circle-xmark" style="color:#ff5e5e; font-size: 26px; display: inline-block;"></i></div><div style="display: block; width: 100%;"><p style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; line-height: 1.45; color: #ffffff; margin: 0; padding: 0; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: normal;">${mensaje}</p></div>`;
+    document.body.appendChild(alerta);
+    setTimeout(() => { alerta.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; alerta.style.opacity = '0'; alerta.style.transform = 'translateY(-15px)'; setTimeout(() => { alerta.remove(); }, 400); }, 4000);
+}
+
+// FUNCIÓN GUARDAR OPERACIÓN
+async function guardarOperacion(prefijo, tipoOperacion) {
+    const botonSubmit = document.querySelector(`#form_${tipoOperacion.toLowerCase()} button[type="submit"]`);
+    botonSubmit.innerText = "Guardando...";
+    botonSubmit.disabled = true;
+
+    try {
+        const precio = parseFloat(document.getElementById(`${prefijo}_precio`)?.value) || 0;
+        const cant = parseFloat(document.getElementById(`${prefijo}_cantidad`)?.value) || 1;
+        const total = precio * cant;
+        const tipoPago = document.getElementById(`${prefijo}_tipo_pago`).value;
+        const abono = tipoPago === 'Abono' ? (parseFloat(document.getElementById(`${prefijo}_abono`)?.value) || 0) : total;
+        const numFactura = datosFacturaActual.numeroFactura || await obtenerSiguienteNumeroFactura();
+        
+        const inputEvidencia = document.getElementById(`${prefijo}_evidencia`);
+        const urlImagen = await subirImagenSupabase(inputEvidencia);
+
+        let descripcion = "", equipo = null, imei = null, imei2 = null, falla = null;
+        let inputProducto = null;
+
+        if (prefijo === 'acc') {
+            inputProducto = document.getElementById('acc_producto');
+            descripcion = inputProducto.value;
+            imei = document.getElementById('acc_imei')?.value;
+        } else if (prefijo === 'cel') {
+            inputProducto = document.getElementById('cel_modelo');
+            descripcion = inputProducto.value;
+            equipo = descripcion;
+            imei = document.getElementById('cel_imei')?.value;
+            imei2 = document.getElementById('cel_imei2')?.value;
+        } else if (prefijo === 'rep') {
+            equipo = document.getElementById('rep_equipo').value;
+            descripcion = "Reparación: " + equipo;
+            imei = document.getElementById('rep_imei')?.value;
+            falla = document.getElementById('rep_falla')?.value;
+        }
+
+        const data = {
+            tipo_operacion: tipoOperacion,
+            numero_factura: numFactura,
+            descripcion: descripcion,
+            equipo: equipo,
+            imei_serial: imei,
+            imei_serial_2: imei2,
+            falla: falla,
+            quantity: cant,
+            price: precio,
+            total: total,
+            amount_paid: abono,
+            customer_name: document.getElementById(`${prefijo}_cliente`).value,
+            customer_phone: document.getElementById(`${prefijo}_telefono`).value || null,
+            asesor: document.getElementById(`${prefijo}_asesor`)?.value || "N/A",
+            payment_method: document.getElementById(`${prefijo}_metodo_pago`).value,
+            payment_type: tipoPago,
+            imagen_url: urlImagen,
+            estado: (abono < total) ? 'Pendiente' : 'Completado',
+            estado_taller: (prefijo === 'rep') ? document.getElementById('rep_estado_taller').value : 'N/A'
+        };
+
+        const { error } = await window.jkSupabase.from(NOMBRE_TABLA).insert([data]);
+        if (error) throw error;
+
+        if (inputProducto && inputProducto.dataset.idInventario) {
+            const idInv = inputProducto.dataset.idInventario;
+            const { data: itemData } = await window.jkSupabase.from('inventario').select('stock').eq('id', idInv).single();
+            if (itemData) {
+                const nuevoStock = itemData.stock - cant;
+                await window.jkSupabase.from('inventario').update({ stock: nuevoStock }).eq('id', idInv);
+            }
+            delete inputProducto.dataset.idInventario;
+        }
+
+        mostrarAlertaExito(`${tipoOperacion} registrado y stock actualizado con éxito.`);
+        document.getElementById(`form_${tipoOperacion.toLowerCase()}`).reset();
+        appCore.actualizarTotales(prefijo);
+        document.getElementById(`preview_${prefijo}`).innerHTML = "Vista previa";
+        datosFacturaActual = {};
+
+    } catch (e) {
+        console.error(e);
+        mostrarAlertaError("Ocurrió un error: " + e.message);
+    } finally {
+        botonSubmit.innerText = "Registrar Venta";
+        botonSubmit.disabled = false;
+    }
+}
+</script>
+</body>
+</html>
