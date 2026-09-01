@@ -166,6 +166,69 @@ select.estado-taller-select {
 }
 select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
 
+/* ============ NUEVO: INICIAR SESIÓN / ASESOR CON PIN ============ */
+.btn-sesion {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #12d8c4;
+    background: rgba(18,216,196,.12);
+    border: 1px solid rgba(18,216,196,.35);
+    cursor: pointer;
+    text-decoration: none;
+    transition: .2s;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: .3px;
+}
+.btn-sesion:hover { background: rgba(18,216,196,.25); border-color: #12d8c4; box-shadow: 0 0 12px rgba(18,216,196,.15); }
+  @keyframes zumbidoSesion {
+    0%, 85%, 100% {
+        transform: translateX(0);
+    }
+    87% {
+    transform: translateX(-5px);
+}
+89% {
+    transform: translateX(5px);
+}
+91% {
+    transform: translateX(-4px);
+}
+93% {
+    transform: translateX(4px);
+}
+95% {
+    transform: translateX(-2px);
+}
+97% {
+    transform: translateX(2px);
+}
+99% {
+    transform: translateX(0);
+}
+}
+
+.btn-sesion {
+    animation: zumbidoSesion 3s ease-in-out infinite;
+}
+
+.asesor-box { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.asesor-pin-row { display: flex; gap: 10px; }
+.asesor-pin-row input { flex: 1; }
+.btn-pin { height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(18,216,196,.35); background: rgba(18,216,196,.10); color: #12d8c4; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: .2s; white-space: nowrap; flex-shrink: 0; }
+.btn-pin:hover { background: rgba(18,216,196,.25); }
+.asesor-hint { display: block; margin-top: 4px; color: #7d8594; font-size: 10.5px; line-height: 1.5; }
+input.pin-ok { border-color: #12d8c4 !important; box-shadow: 0 0 12px rgba(18,216,196,.15) !important; }
+input.pin-error { border-color: #ff5e5e !important; box-shadow: 0 0 12px rgba(255,94,94,.15) !important; }
+input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.06) !important; color: #12d8c4 !important; font-weight: 600; }
+
+.sesion-banner { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(18,216,196,.35); background: rgba(18,216,196,.08); color: #bfc6d2; font-size: 11.5px; margin-bottom: 18px; line-height: 1.5; }
+.sesion-banner i { color: #12d8c4; margin-top: 2px; flex-shrink: 0; }
+.sesion-banner strong { color: #12d8c4; }
+
 @media(max-width: 700px) {
     .container { padding: 22px 14px; }
     .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 100%; }
@@ -180,6 +243,8 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
     .form-modal-content { max-height: 94vh; border-radius: 18px; }
     .form-modal .form { padding: 28px 18px 20px; }
     .modal-close { top: 10px; right: 10px; width: 34px; height: 34px; }
+    .asesor-pin-row { flex-direction: column; }
+    .btn-pin { width: 100%; }
 }
 </style>
 </head>
@@ -193,9 +258,9 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
         </div>
         <div class="user">
             <div class="user-info">
-                <strong>Usuario</strong>
-                <span>Vendedor</span>
-                <!-- MODIFICADO: navegacion interna de la app (ya no saca a enlace externo) -->         
+                <strong id="headerUsuario">Usuario</strong>
+                <span id="headerRol">Vendedor</span>
+                <button type="button" id="btnSesion" class="btn-sesion" onclick="abrirModalSesion()"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</button>
             </div>
             <div class="avatar"><img src="https://i.imgur.com/SC6JNcp.gif" alt="Usuario"></div>
         </div>
@@ -245,7 +310,17 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
                 <div class="field"><label>Precio Unitario</label><input type="number" id="acc_precio" required oninput="appCore.actualizarTotales('acc')"></div>
                 <div class="field"><label>Cliente</label><input type="text" id="acc_cliente" required></div>
                 <div class="field"><label>Teléfono</label><input type="tel" id="acc_telefono"></div>
-                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="acc_asesor" required></div>
+                <div class="field full">
+                    <label>Nombre de Asesor (validación por PIN)</label>
+                    <div class="asesor-box">
+                        <div class="asesor-pin-row">
+                            <input type="password" id="acc_pin" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Ingresa tu PIN de asesor">
+                            <button type="button" class="btn-pin" onclick="validarPinAsesor('acc')"><i class="fa-solid fa-key"></i> Validar PIN</button>
+                        </div>
+                        <input type="text" id="acc_asesor" readonly placeholder="El nombre del asesor se completará automáticamente si el PIN es correcto" required>
+                        <span class="asesor-hint">El PIN es personal e intransferible. El nombre del asesor se asigna según el PIN registrado.</span>
+                    </div>
+                </div>
                 <div class="field"><label>Método de pago</label><select id="acc_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="acc_tipo_pago" required onchange="appCore.toggleAbono('acc')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
                 <div class="field full" id="div_acc_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="acc_abono" oninput="appCore.actualizarTotales('acc')"></div>
@@ -291,7 +366,17 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
                 <div class="field"><label>Precio Unitario</label><input type="number" id="cel_precio" required oninput="appCore.actualizarTotales('cel')"></div>
                 <div class="field"><label>Cliente</label><input type="text" id="cel_cliente" required></div>
                 <div class="field"><label>Teléfono</label><input type="tel" id="cel_telefono"></div>
-                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="cel_asesor" required></div>
+                <div class="field full">
+                    <label>Nombre de Asesor (validación por PIN)</label>
+                    <div class="asesor-box">
+                        <div class="asesor-pin-row">
+                            <input type="password" id="cel_pin" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Ingresa tu PIN de asesor">
+                            <button type="button" class="btn-pin" onclick="validarPinAsesor('cel')"><i class="fa-solid fa-key"></i> Validar PIN</button>
+                        </div>
+                        <input type="text" id="cel_asesor" readonly placeholder="El nombre del asesor se completará automáticamente si el PIN es correcto" required>
+                        <span class="asesor-hint">El PIN es personal e intransferible. El nombre del asesor se asigna según el PIN registrado.</span>
+                    </div>
+                </div>
                 <div class="field"><label>Método de pago</label><select id="cel_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="cel_tipo_pago" required onchange="appCore.toggleAbono('cel')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
                 <div class="field full" id="div_cel_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="cel_abono" oninput="appCore.actualizarTotales('cel')"></div>
@@ -332,7 +417,17 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
                 <div class="field"><label>Valor de Reparación</label><input type="number" id="rep_precio" required oninput="appCore.actualizarTotales('rep')"></div>
                 <div class="field"><label>Cliente</label><input type="text" id="rep_cliente" required></div>
                 <div class="field"><label>Teléfono</label><input type="tel" id="rep_telefono"></div>
-                <div class="field full"><label>Nombre de Asesor</label><input type="text" id="rep_asesor" required></div>
+                <div class="field full">
+                    <label>Nombre de Asesor (validación por PIN)</label>
+                    <div class="asesor-box">
+                        <div class="asesor-pin-row">
+                            <input type="password" id="rep_pin" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Ingresa tu PIN de asesor">
+                            <button type="button" class="btn-pin" onclick="validarPinAsesor('rep')"><i class="fa-solid fa-key"></i> Validar PIN</button>
+                        </div>
+                        <input type="text" id="rep_asesor" readonly placeholder="El nombre del asesor se completará automáticamente si el PIN es correcto" required>
+                        <span class="asesor-hint">El PIN es personal e intransferible. El nombre del asesor se asigna según el PIN registrado.</span>
+                    </div>
+                </div>
                 <div class="field"><label>Método de pago</label><select id="rep_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="rep_tipo_pago" required onchange="appCore.toggleAbono('rep')"><option value="Completo">Pago completo (100%)</option><option value="Abono">Dejar Abono (Anticipo)</option></select></div>
                 <div class="field full" id="div_rep_abono" style="display: none;"><label>Valor del Anticipo / Abono</label><input type="number" id="rep_abono" oninput="appCore.actualizarTotales('rep')"></div>
@@ -348,6 +443,33 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
             <div class="total-box"><div class="total-item"><span>Costo Total</span><strong id="tot_rep_general">$0</strong></div><div class="total-item pendiente"><span>Saldo Pendiente</span><strong id="tot_rep_pendiente">$0</strong></div></div>
             <button type="button" class="secondary-bill" onclick="appCore.prepararFactura('rep')"><i class="fa-solid fa-file-invoice"></i> Crear Factura</button>
             <button type="submit" class="submit">Registrar reparación</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ANIMADO: INICIAR SESIÓN / REGISTRO DE ASESOR (SE HACE UNA SOLA VEZ) -->
+<div class="form-modal" id="modal_sesion">
+    <div class="form-modal-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_sesion')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <form class="form active" id="form_sesion" onsubmit="event.preventDefault(); registrarAsesor();">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                <div><h3>Iniciar sesión</h3><p>Registra tus datos una sola vez y crea tu PIN personal.</p></div>
+            </div>
+            <div class="sesion-banner" id="ses_banner" style="display: none;">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Ya tienes una sesión guardada en este equipo (<strong id="ses_banner_nombre"></strong>). Puedes seguir usándola o registrar otra cuenta.</span>
+            </div>
+            <div class="grid">
+                <div class="field"><label>Nombre del Asesor</label><input type="text" id="ses_nombre" placeholder="Ej: Juan Pérez" required></div>
+                <div class="field"><label>Correo electrónico</label><input type="text" id="ses_email" placeholder="tucorreo@email.com" required></div>
+                <div class="field"><label>Crear PIN (entre 4 y 6 caracteres)</label><input type="password" id="ses_pin" inputmode="numeric" autocomplete="new-password" maxlength="6" placeholder="••••" required></div>
+                <div class="field"><label>Confirmar PIN</label><input type="password" id="ses_pin2" inputmode="numeric" autocomplete="new-password" maxlength="6" placeholder="••••" required></div>
+                <div class="field full">
+                    <p class="asesor-hint">???? Tu PIN se guarda cifrado (hash) y solo tú lo conocerás. Puede ser cualquier combinación de 4 a 6 caracteres. Este registro se realiza <strong>una sola vez</strong>: si tu correo ya está registrado, se iniciará sesión con el PIN que elegiste.</p>
+                </div>
+            </div>
+            <button type="submit" class="submit" id="btnRegistrarSesion">Guardar e iniciar sesión</button>
         </form>
     </div>
 </div>
@@ -375,6 +497,237 @@ window.jkSupabase = window.jkSupabase || window.supabase.createClient(
 const NOMBRE_TABLA = 'operaciones';
 let datosFacturaActual = {};
 const PREFIJO_FACTURA = "JK/";
+
+// ============================================================
+// NUEVO: INICIO DE SESIÓN / REGISTRO DE ASESOR CON PIN (UNA SOLA VEZ)
+// Tabla 'asesores' (opcional) en Supabase con columnas:
+// id (uuid PK), nombre (text), email (text), rol (text),
+// created_at (timestamptz), pin_hash (text).
+// Si la tabla no existe o sus políticas bloquean la escritura, la
+// cuenta se guarda automáticamente en este equipo (sin errores).
+// El PIN es libre: cualquier valor entre 4 y 6 caracteres.
+// ============================================================
+const TABLA_ASESORES = 'asesores';
+const CLAVE_SESION = 'jk_sesion_actual';
+const CLAVE_ASESORES_LOCAL = 'jk_asesores_local';
+let cacheAsesores = null;
+
+function generarUUID() {
+    try { if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID(); } catch (e) {}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+async function hashPin(pin) {
+    const texto = 'JK-SEGURO-' + String(pin);
+    try {
+        if (window.crypto && window.crypto.subtle) {
+            const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+    } catch (e) {}
+    let h = 0x811c9dc5;
+    for (let i = 0; i < texto.length; i++) { h ^= texto.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return 'fnv_' + (h >>> 0).toString(16);
+}
+
+function obtenerSesion() {
+    try { return JSON.parse(localStorage.getItem(CLAVE_SESION) || 'null'); } catch (e) { return null; }
+}
+function guardarSesion(sesion) {
+    try { localStorage.setItem(CLAVE_SESION, JSON.stringify(sesion)); } catch (e) {}
+}
+
+function obtenerAsesoresLocales() {
+    try { return JSON.parse(localStorage.getItem(CLAVE_ASESORES_LOCAL) || '[]'); } catch (e) { return []; }
+}
+function guardarAsesorLocal(asesor) {
+    const lista = obtenerAsesoresLocales().filter(a => a.email !== asesor.email);
+    lista.push(asesor);
+    try { localStorage.setItem(CLAVE_ASESORES_LOCAL, JSON.stringify(lista)); } catch (e) {}
+}
+
+async function obtenerAsesoresRemotos() {
+    if (!cacheAsesores) {
+        const { data, error } = await window.jkSupabase.from(TABLA_ASESORES).select('id, nombre, email, rol, pin_hash');
+        if (error) { console.warn('Tabla asesores no disponible, se usará el registro local.', error); cacheAsesores = []; }
+        else { cacheAsesores = data || []; }
+    }
+    return cacheAsesores;
+}
+
+async function buscarAsesorPorPin(pin) {
+    const hash = await hashPin(pin);
+    try {
+        const remotos = await obtenerAsesoresRemotos();
+        const encontrado = remotos.find(a => a.pin_hash === hash);
+        if (encontrado) return encontrado;
+    } catch (e) {}
+    const locales = obtenerAsesoresLocales();
+    return locales.find(a => a.pin_hash === hash) || null;
+}
+
+function actualizarHeaderSesion() {
+    const s = obtenerSesion();
+    const btn = document.getElementById('btnSesion');
+    const u = document.getElementById('headerUsuario');
+    const r = document.getElementById('headerRol');
+    if (s) {
+        u.innerText = s.nombre || 'Usuario';
+        r.innerText = s.rol || 'Asesor';
+        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sesión activa';
+    } else {
+        u.innerText = 'Usuario';
+        r.innerText = 'Vendedor';
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+    }
+}
+
+function abrirModalSesion() {
+    const s = obtenerSesion();
+    const banner = document.getElementById('ses_banner');
+    if (s) {
+        banner.style.display = 'flex';
+        document.getElementById('ses_banner_nombre').innerText = s.nombre || '';
+        if (!document.getElementById('ses_nombre').value) document.getElementById('ses_nombre').value = s.nombre || '';
+        if (!document.getElementById('ses_email').value) document.getElementById('ses_email').value = s.email || '';
+    } else {
+        banner.style.display = 'none';
+    }
+    abrirModalFormulario('modal_sesion');
+}
+
+async function validarPinAsesor(prefijo, silencioso) {
+    const pinInput = document.getElementById(`${prefijo}_pin`);
+    const asesorInput = document.getElementById(`${prefijo}_asesor`);
+    const pin = (pinInput ? pinInput.value : '').trim();
+    if (pin.length < 4 || pin.length > 6) {
+        if (!silencioso) mostrarAlertaError('El PIN debe tener entre 4 y 6 caracteres.');
+        return false;
+    }
+    try {
+        const asesor = await buscarAsesorPorPin(pin);
+        if (asesor) {
+            asesorInput.value = asesor.nombre;
+            asesorInput.dataset.asesorId = asesor.id || '';
+            asesorInput.classList.add('validado');
+            pinInput.classList.remove('pin-error');
+            pinInput.classList.add('pin-ok');
+            if (!silencioso) mostrarAlertaExito(`PIN correcto. Asesor asignado: ${asesor.nombre}`);
+            return true;
+        } else {
+            asesorInput.value = '';
+            delete asesorInput.dataset.asesorId;
+            asesorInput.classList.remove('validado');
+            pinInput.classList.remove('pin-ok');
+            pinInput.classList.add('pin-error');
+            if (!silencioso) mostrarAlertaError('PIN no registrado. Verifica el PIN o crea tu cuenta con el botón "Iniciar Sesión".');
+            return false;
+        }
+    } catch (e) {
+        console.error(e);
+        if (!silencioso) mostrarAlertaError('No se pudo validar el PIN: ' + e.message);
+        return false;
+    }
+}
+
+// Escucha el PIN en los tres formularios de operación
+['acc', 'cel', 'rep'].forEach(p => {
+    const pinInput = document.getElementById(`${p}_pin`);
+    const asesorInput = document.getElementById(`${p}_asesor`);
+    if (!pinInput || !asesorInput) return;
+    pinInput.addEventListener('input', () => {
+        if (asesorInput.value) { asesorInput.value = ''; delete asesorInput.dataset.asesorId; asesorInput.classList.remove('validado'); }
+        pinInput.classList.remove('pin-ok', 'pin-error');
+    });
+    pinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); validarPinAsesor(p, false); }
+    });
+});
+
+function cerrarSesion() {
+    try { localStorage.removeItem(CLAVE_SESION); } catch (e) {}
+    cacheAsesores = null;
+    actualizarHeaderSesion();
+    ['acc', 'cel', 'rep'].forEach(p => {
+        const a = document.getElementById(`${p}_asesor`);
+        const pi = document.getElementById(`${p}_pin`);
+        if (a) { a.value = ''; a.classList.remove('validado'); delete a.dataset.asesorId; }
+        if (pi) { pi.value = ''; pi.classList.remove('pin-ok', 'pin-error'); }
+    });
+    mostrarAlertaExito('Sesión cerrada correctamente.');
+}
+
+async function registrarAsesor() {
+    const nombre = document.getElementById('ses_nombre').value.trim();
+    const email = document.getElementById('ses_email').value.trim();
+    const pin = document.getElementById('ses_pin').value.trim();
+    const pin2 = document.getElementById('ses_pin2').value.trim();
+    const btn = document.getElementById('btnRegistrarSesion');
+
+    if (!nombre || !email || !pin || !pin2) { mostrarAlertaError('Completa todos los campos.'); return; }
+    if (pin.length < 4 || pin.length > 6) { mostrarAlertaError('El PIN puede tener entre 4 y 6 caracteres. Intenta de nuevo.'); return; }
+    if (pin !== pin2) { mostrarAlertaError('Los PIN no coinciden. Verifica e inténtalo de nuevo.'); return; }
+
+    btn.disabled = true;
+    btn.innerText = 'Procesando...';
+    try {
+        const pinHash = await hashPin(pin);
+        const perfil = { id: generarUUID(), nombre: nombre, email: email, rol: 'asesor', pin_hash: pinHash, created_at: new Date().toISOString() };
+        let guardadoRemoto = false;
+
+        // 1) Si el correo ya estaba registrado, se inicia sesión con el PIN ingresado
+        try {
+            const { data: existentes } = await window.jkSupabase.from(TABLA_ASESORES).select('id, nombre, email, rol, pin_hash').eq('email', email);
+            const existente = (existentes && existentes.length) ? existentes[0] : null;
+            if (existente) {
+                if (existente.pin_hash === pinHash) {
+                    perfil.id = existente.id;
+                    perfil.nombre = existente.nombre || nombre;
+                    perfil.rol = existente.rol || 'asesor';
+                    guardadoRemoto = true;
+                } else {
+                    mostrarAlertaError('Ese correo ya está registrado con otro PIN. Ingresa el PIN correcto.');
+                    return;
+                }
+            }
+        } catch (e) { /* tabla no disponible, se continúa sin errores */ }
+
+        // 2) Si el correo no existía, se guarda el perfil en la tabla
+        if (!guardadoRemoto) {
+            try {
+                const { error } = await window.jkSupabase.from(TABLA_ASESORES).insert([{
+                    id: perfil.id, nombre: perfil.nombre, email: perfil.email,
+                    rol: perfil.rol, created_at: perfil.created_at, pin_hash: perfil.pin_hash
+                }]);
+                guardadoRemoto = !error;
+            } catch (e) { guardadoRemoto = false; }
+        }
+
+        // 3) Respaldo local: la sesión y el PIN siempre funcionan en este equipo
+        guardarAsesorLocal(perfil);
+        cacheAsesores = null;
+        guardarSesion(perfil);
+        actualizarHeaderSesion();
+        document.getElementById('form_sesion').reset();
+        cerrarModalFormulario('modal_sesion');
+        if (guardadoRemoto) {
+            mostrarAlertaExito('¡Listo ' + perfil.nombre + '! Tu cuenta quedó activa. Usa tu PIN en los formularios.');
+        } else {
+            mostrarAlertaExito('¡Listo ' + perfil.nombre + '! Tu cuenta quedó activa en este equipo. (La tabla asesores no respondió, se guardó localmente)');
+        }
+    } catch (e) {
+        console.error(e);
+        mostrarAlertaError('Error: ' + (e.message || 'No se pudo completar el registro.'));
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Guardar e iniciar sesión';
+    }
+}
+
+actualizarHeaderSesion();
 
 // Lógica de Navegación (Cards -> Abren modales animados independientes)
 document.querySelectorAll('.card').forEach(card => {
@@ -602,6 +955,13 @@ function mostrarAlertaError(mensaje) {
 
 // FUNCIÓN GUARDAR OPERACIÓN
 async function guardarOperacion(prefijo, tipoOperacion) {
+    // NUEVO: Validación del PIN del asesor (no altera la lógica original)
+    const asesorValor = (document.getElementById(`${prefijo}_asesor`)?.value || '').trim();
+    if (!asesorValor) {
+        mostrarAlertaError('Debes validar tu PIN en el campo "Nombre de Asesor" para continuar.');
+        return;
+    }
+
     const botonSubmit = document.querySelector(`#form_${tipoOperacion.toLowerCase()} button[type="submit"]`);
     botonSubmit.innerText = "Guardando...";
     botonSubmit.disabled = true;
