@@ -85,7 +85,7 @@ input:focus, select:focus, textarea:focus { border-color: #12d8c4; box-shadow: 0
 select option { background: #171a21; }
 
 /* MODALES DE FORMULARIOS ANIMADOS */
-.form-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(6,9,14,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s ease, visibility .35s ease; }
+.form-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(6,9,14,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: flex-start; padding-top: 40	px; justify-content: center; z-index: 2000; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s ease, visibility .35s ease; }
 .form-modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
 .form-modal-content { position: relative; width: 100%; max-width: 780px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 22px; border: 1px solid rgba(18,216,196,.16); background: #171a21; box-shadow: 0 30px 90px rgba(0,0,0,.65), 0 0 50px rgba(18,216,196,.06); opacity: 0; transform: translateY(48px) scale(.93); transition: transform .55s cubic-bezier(.22,1.32,.36,1), opacity .38s ease; }
 .form-modal.show .form-modal-content { opacity: 1; transform: translateY(0) scale(1); }
@@ -1076,10 +1076,44 @@ const appCore = {
         datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/D/g, ''), numeroFactura: numFactura, falla: falla };
         document.getElementById('resumenFactura').innerText = decodeURIComponent(msg.replace(/%0A/g, 'n'));
     },
+    mostrarAvisoPDF: () => {
+    const aviso = document.createElement('div');
+
+    aviso.innerHTML = `
+        <i class="fa-solid fa-circle-check"></i>
+        PDF descargado correctamente
+    `;
+
+    Object.assign(aviso.style, {
+        position: 'fixed',
+        top: '25px',
+        right: '25px',
+        background: '#198754',
+        color: '#ffffff',
+        padding: '14px 20px',
+        borderRadius: '10px',
+        fontSize: '15px',
+        fontWeight: '600',
+        zIndex: '99999',
+        boxShadow: '0 5px 20px rgba(0,0,0,0.25)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '9px'
+    });
+
+    document.body.appendChild(aviso);
+
+    setTimeout(() => {
+        aviso.remove();
+    }, 3000);
+},
     descargarPDF: () => {
         const elemento = document.getElementById('pdf-invoice');
         const num = document.getElementById('pdf-numero').innerText.replace('/', '-');
-        html2pdf().set({ margin: [0.3, 0.3, 0.3, 0.3], filename: `Factura_JK_${num}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save().then(() => document.getElementById('modalFactura').style.display = 'none');
+        html2pdf().set({ margin: [0.3, 0.3, 0.3, 0.3], filename: `Factura_JK_${num}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save().then(() => {
+    document.getElementById('modalFactura').style.display = 'none';
+    appCore.mostrarAvisoPDF();
+});
     },
     enviarPorWhatsApp: () => {
         let num = datosFacturaActual.telefono || "";
