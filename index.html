@@ -48,6 +48,12 @@ body { font-family: 'Poppins', sans-serif; min-height: 100vh; color: #fff; backg
 .title h2 { font-size: 27px; font-weight: 600; }
 .title p { color: #7d8594; font-size: 13px; margin-top: 6px; }
 
+/* NUEVO: aviso de sesión requerida */
+.aviso-sesion { display: none; align-items: center; gap: 8px; width: fit-content; margin: 14px auto 0; padding: 7px 16px; border-radius: 20px; font-size: 11.5px; font-weight: 500; color: #ff5e5e; background: rgba(255,94,94,.10); border: 1px solid rgba(255,94,94,.3); cursor: pointer; transition: .2s; }
+.aviso-sesion:hover { background: rgba(255,94,94,.2); }
+.aviso-sesion.show { display: flex; }
+.aviso-sesion i { font-size: 11px; }
+
 /* TARJETAS VERTICALES EN FILA DE TRES */
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 840px; margin: 0 auto 25px; }
 .card { min-width: 0; padding: 28px 18px 24px; border-radius: 18px; border: 1px solid rgba(18,216,196,.10); background: #171a21; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; transition: transform .3s cubic-bezier(.22,1,.36,1), border-color .3s, box-shadow .3s; text-align: center; animation: cardIn .6s cubic-bezier(.22,1,.36,1) both; }
@@ -63,6 +69,11 @@ body { font-family: 'Poppins', sans-serif; min-height: 100vh; color: #fff; backg
 .card-text { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .card h3 { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.2; }
 .card p { color: #7d8594; font-size: 11.5px; margin: 0; line-height: 1.35; }
+
+/* NUEVO: tarjetas bloqueadas cuando no hay sesión iniciada */
+.card.locked { position: relative; opacity: .72; }
+.card.locked::after { content: '\f023'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ff5e5e; background: rgba(255,94,94,.12); border: 1px solid rgba(255,94,94,.35); }
+.card.locked:hover { border-color: rgba(255,94,94,.45); }
 
 /* FORMULARIOS */
 .form { display: none; padding: 28px; border-radius: 20px; border: 1px solid rgba(18,216,196,.10); background: #171a21; }
@@ -85,7 +96,7 @@ input:focus, select:focus, textarea:focus { border-color: #12d8c4; box-shadow: 0
 select option { background: #171a21; }
 
 /* MODALES DE FORMULARIOS ANIMADOS */
-.form-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(6,9,14,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: flex-start; padding-top: 40	px; justify-content: center; z-index: 2000; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s ease, visibility .35s ease; }
+.form-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(6,9,14,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: flex; align-items: flex-start; padding-top: 40px; justify-content: center; z-index: 2000; padding: 22px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s ease, visibility .35s ease; }
 .form-modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
 .form-modal-content { position: relative; width: 100%; max-width: 780px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 22px; border: 1px solid rgba(18,216,196,.16); background: #171a21; box-shadow: 0 30px 90px rgba(0,0,0,.65), 0 0 50px rgba(18,216,196,.06); opacity: 0; transform: translateY(48px) scale(.93); transition: transform .55s cubic-bezier(.22,1.32,.36,1), opacity .38s ease; }
 .form-modal.show .form-modal-content { opacity: 1; transform: translateY(0) scale(1); }
@@ -196,31 +207,15 @@ select.estado-taller-select:focus { border-color: #12d8c4; outline: none; }
     letter-spacing: .3px;
 }
 .btn-sesion:hover { background: rgba(18,216,196,.25); border-color: #12d8c4; box-shadow: 0 0 12px rgba(18,216,196,.15); }
-  @keyframes zumbidoSesion {
-    0%, 85%, 100% {
-        transform: translateX(0);
-    }
-    87% {
-    transform: translateX(-5px);
-}
-89% {
-    transform: translateX(5px);
-}
-91% {
-    transform: translateX(-4px);
-}
-93% {
-    transform: translateX(4px);
-}
-95% {
-    transform: translateX(-2px);
-}
-97% {
-    transform: translateX(2px);
-}
-99% {
-    transform: translateX(0);
-}
+@keyframes zumbidoSesion {
+    0%, 85%, 100% { transform: translateX(0); }
+    87% { transform: translateX(-5px); }
+    89% { transform: translateX(5px); }
+    91% { transform: translateX(-4px); }
+    93% { transform: translateX(4px); }
+    95% { transform: translateX(-2px); }
+    97% { transform: translateX(2px); }
+    99% { transform: translateX(0); }
 }
 
 .btn-sesion {
@@ -240,6 +235,32 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
 .sesion-banner { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(18,216,196,.35); background: rgba(18,216,196,.08); color: #bfc6d2; font-size: 11.5px; margin-bottom: 18px; line-height: 1.5; }
 .sesion-banner i { color: #12d8c4; margin-top: 2px; flex-shrink: 0; }
 .sesion-banner strong { color: #12d8c4; }
+.btn-cerrar-sesion {
+    margin-left: auto;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 80, 80, 0.45);
+    background: rgba(255, 80, 80, 0.10);
+    color: #ff6b6b;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-cerrar-sesion:hover {
+    background: rgba(255, 80, 80, 0.18);
+    border-color: rgba(255, 80, 80, 0.7);
+}
+
+.btn-cerrar-sesion i {
+    color: #ff6b6b;
+    margin-top: 0;
+}
 
 @media(max-width: 700px) {
     .container { padding: 22px 14px; }
@@ -249,6 +270,7 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     .card .icon i { font-size: 18px; }
     .card h3 { font-size: 12px; }
     .card p { font-size: 9.5px; }
+    .card.locked::after { top: 6px; right: 6px; width: 18px; height: 18px; font-size: 8px; }
     .grid { grid-template-columns: 1fr; }
     .field.full { grid-column: auto; }
     .form-modal { padding: 10px; }
@@ -258,6 +280,8 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     .asesor-pin-row { flex-direction: column; }
     .btn-pin { width: 100%; }
     .evidence-multi { grid-template-columns: 1fr; }
+    .sesion-banner { flex-wrap: wrap; }
+    .btn-cerrar-sesion { margin-left: 0; }
 }
 </style>
 </head>
@@ -282,6 +306,8 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     <div class="title">
         <h2>Registrar operación</h2>
         <p>Selecciona el tipo de operación que deseas registrar.</p>
+        <!-- NUEVO: aviso cuando no hay sesión iniciada -->
+        <div class="aviso-sesion" id="avisoSesion" onclick="abrirModalSesion()"><i class="fa-solid fa-lock"></i> Debes iniciar sesión para poder diligenciar los formularios.</div>
     </div>
 
     <!-- TARJETAS VERTICALES EN FILA DE TRES -->
@@ -369,7 +395,7 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
                             </div>
                             <div class="evidence-slot">
                                 <input type="file" id="acc_evidencia3" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc_3')">
-                                <button type="button" class="camera" onclick="document.getElementById('acc_evidencia3').click()"><i class="fa-solid fa-camera"></i> Evidencia 3</button>
+                                <button type="button" class="camera" onclick="document.getElementById('acc_evidencia3').click()"><i class="fa-solid fa-camera"></i> Evidencia 3 o comprobante de pago</button>
                                 <div class="preview" id="preview_acc_3">Vista previa 3</div>
                             </div>
                         </div>
@@ -561,15 +587,30 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
             </div>
             <div class="sesion-banner" id="ses_banner" style="display: none;">
                 <i class="fa-solid fa-circle-check"></i>
-                <span>Ya tienes una sesión guardada en este equipo (<strong id="ses_banner_nombre"></strong>). Puedes seguir usándola o registrar otra cuenta.</span>
+                <span>Ya tienes una sesión activa en este equipo (<strong id="ses_banner_nombre"></strong>). Esta cuenta ya tiene un PIN asignado y es el único válido para iniciar sesión. Si deseas registrar otra cuenta debe ser con un nombre y un correo diferentes.</span>
+                <button type="button" onclick="cerrarSesion()" class="btn-cerrar-sesion">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </button>
             </div>
             <div class="grid">
                 <div class="field"><label>Nombre del Asesor</label><input type="text" id="ses_nombre" placeholder="Ej: Juan Pérez" required></div>
                 <div class="field"><label>Correo electrónico</label><input type="text" id="ses_email" placeholder="tucorreo@email.com" required></div>
+                <!-- NUEVO: ROL DEL USUARIO (se muestra en el encabezado en lugar de "Asesor") -->
+                <div class="field full">
+                    <label>Rol <i class="fa-solid fa-id-badge" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <select id="ses_rol" required>
+                        <option value="">Selecciona tu rol...</option>
+                        <option value="Asesor">Asesor</option>
+                        <option value="Vendedor">Vendedor</option>
+                        <option value="Técnico">Técnico</option>
+                        <option value="Cajero">Cajero</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
+                </div>
                 <div class="field"><label>Crear PIN (entre 4 y 6 caracteres)</label><input type="password" id="ses_pin" inputmode="numeric" autocomplete="new-password" maxlength="6" placeholder="••••" required></div>
                 <div class="field"><label>Confirmar PIN</label><input type="password" id="ses_pin2" inputmode="numeric" autocomplete="new-password" maxlength="6" placeholder="••••" required></div>
                 <div class="field full">
-                    <p class="asesor-hint">???? Tu PIN se guarda cifrado (hash) y solo tú lo conocerás. Puede ser cualquier combinación de 4 a 6 caracteres. Este registro se realiza <strong>una sola vez</strong>: si tu correo ya está registrado, se iniciará sesión con el PIN que elegiste.</p>
+                    <p class="asesor-hint">Tu PIN se guarda cifrado (hash) y solo tú lo conocerás. Puede ser cualquier combinación de 4 a 6 caracteres. Este registro se realiza <strong>una sola vez</strong>: si tu correo ya está registrado, se iniciará sesión únicamente con el PIN que elegiste. Cada nombre y correo solo pueden registrarse una vez; para crear otra cuenta debes usar un nombre y un correo diferentes.</p>
                 </div>
             </div>
             <button type="submit" class="submit" id="btnRegistrarSesion">Guardar e iniciar sesión</button>
@@ -614,6 +655,11 @@ const GARANTIA_POR_DEFECTO = "La garantía de todo producto o reparación es de 
 // Si la tabla no existe o sus políticas bloquean la escritura, la
 // cuenta se guarda automáticamente en este equipo (sin errores).
 // El PIN es libre: cualquier valor entre 4 y 6 caracteres.
+// Reglas:
+//  - Cada nombre y cada correo solo pueden registrarse UNA vez.
+//  - El PIN creado es el ÚNICO que permite iniciar sesión con esa cuenta.
+//  - Para crear otra cuenta se debe usar un nombre y un correo diferentes.
+//  - Sin sesión iniciada no se puede diligenciar ningún formulario.
 // ============================================================
 const TABLA_ASESORES = 'asesores';
 const CLAVE_SESION = 'jk_sesion_actual';
@@ -677,20 +723,43 @@ async function buscarAsesorPorPin(pin) {
     return locales.find(a => a.pin_hash === hash) || null;
 }
 
+// NUEVO: utilidades para comparar nombre/correo y mostrar el rol
+function normalizarTexto(t) { return String(t || '').trim().toLowerCase(); }
+function formatearRol(rol) {
+    const r = String(rol || 'Asesor').trim() || 'Asesor';
+    return r.charAt(0).toUpperCase() + r.slice(1);
+}
+
+// NUEVO: busca si el nombre o el correo ya están registrados (Supabase + respaldo local)
+async function buscarAsesorRegistrado(nombre, email) {
+    const n = normalizarTexto(nombre), e = normalizarTexto(email);
+    let lista = [];
+    try { cacheAsesores = null; lista = lista.concat((await obtenerAsesoresRemotos()) || []); } catch (err) {}
+    lista = lista.concat(obtenerAsesoresLocales());
+    return {
+        porEmail: lista.find(a => normalizarTexto(a.email) === e) || null,
+        porNombre: lista.find(a => normalizarTexto(a.nombre) === n) || null
+    };
+}
+
 function actualizarHeaderSesion() {
     const s = obtenerSesion();
     const btn = document.getElementById('btnSesion');
     const u = document.getElementById('headerUsuario');
     const r = document.getElementById('headerRol');
+    const aviso = document.getElementById('avisoSesion');
     if (s) {
         u.innerText = s.nombre || 'Usuario';
-        r.innerText = s.rol || 'Asesor';
+        r.innerText = formatearRol(s.rol); // NUEVO: muestra el rol elegido en el registro
         btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sesión activa';
     } else {
         u.innerText = 'Usuario';
         r.innerText = 'Vendedor';
         btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
     }
+    // NUEVO: sin sesión, las tarjetas quedan bloqueadas y se muestra el aviso
+    document.querySelectorAll('.card').forEach(c => c.classList.toggle('locked', !s));
+    if (aviso) aviso.classList.toggle('show', !s);
 }
 
 function abrirModalSesion() {
@@ -698,9 +767,15 @@ function abrirModalSesion() {
     const banner = document.getElementById('ses_banner');
     if (s) {
         banner.style.display = 'flex';
-        document.getElementById('ses_banner_nombre').innerText = s.nombre || '';
+        document.getElementById('ses_banner_nombre').innerText = (s.nombre || '') + (s.rol ? ' · ' + formatearRol(s.rol) : '');
         if (!document.getElementById('ses_nombre').value) document.getElementById('ses_nombre').value = s.nombre || '';
         if (!document.getElementById('ses_email').value) document.getElementById('ses_email').value = s.email || '';
+        // NUEVO: preselecciona el rol de la sesión activa
+        const selRol = document.getElementById('ses_rol');
+        if (selRol && !selRol.value && s.rol) {
+            const op = Array.from(selRol.options).find(o => normalizarTexto(o.value) === normalizarTexto(s.rol));
+            if (op) selRol.value = op.value;
+        }
     } else {
         banner.style.display = 'none';
     }
@@ -765,46 +840,61 @@ function cerrarSesion() {
         if (a) { a.value = ''; a.classList.remove('validado'); delete a.dataset.asesorId; }
         if (pi) { pi.value = ''; pi.classList.remove('pin-ok', 'pin-error'); }
     });
+    // NUEVO: se oculta el aviso de sesión activa dentro del modal
+    const banner = document.getElementById('ses_banner');
+    if (banner) banner.style.display = 'none';
     mostrarAlertaExito('Sesión cerrada correctamente.');
 }
 
 async function registrarAsesor() {
     const nombre = document.getElementById('ses_nombre').value.trim();
     const email = document.getElementById('ses_email').value.trim();
+    const rol = (document.getElementById('ses_rol').value || '').trim(); // NUEVO
     const pin = document.getElementById('ses_pin').value.trim();
     const pin2 = document.getElementById('ses_pin2').value.trim();
     const btn = document.getElementById('btnRegistrarSesion');
 
-    if (!nombre || !email || !pin || !pin2) { mostrarAlertaError('Completa todos los campos.'); return; }
+    if (!nombre || !email || !rol || !pin || !pin2) { mostrarAlertaError('Completa todos los campos, incluido el rol.'); return; }
     if (pin.length < 4 || pin.length > 6) { mostrarAlertaError('El PIN puede tener entre 4 y 6 caracteres. Intenta de nuevo.'); return; }
     if (pin !== pin2) { mostrarAlertaError('Los PIN no coinciden. Verifica e inténtalo de nuevo.'); return; }
+
+    // NUEVO: con una sesión activa no se puede volver a crear una cuenta con el mismo nombre o correo
+    const sesionActiva = obtenerSesion();
+    if (sesionActiva && (normalizarTexto(sesionActiva.email) === normalizarTexto(email) || normalizarTexto(sesionActiva.nombre) === normalizarTexto(nombre))) {
+        mostrarAlertaError('Ya tienes una sesión activa con estos datos. Esta cuenta ya tiene un PIN asignado y es el único válido para iniciar sesión. Para crear otra cuenta usa un nombre y un correo diferentes.');
+        return;
+    }
 
     btn.disabled = true;
     btn.innerText = 'Procesando...';
     try {
         const pinHash = await hashPin(pin);
-        const perfil = { id: generarUUID(), nombre: nombre, email: email, rol: 'asesor', pin_hash: pinHash, created_at: new Date().toISOString() };
+        const perfil = { id: generarUUID(), nombre: nombre, email: email, rol: rol, pin_hash: pinHash, created_at: new Date().toISOString() };
         let guardadoRemoto = false;
+        let esInicioSesion = false;
 
-        // 1) Si el correo ya estaba registrado, se inicia sesión con el PIN ingresado
-        try {
-            const { data: existentes } = await window.jkSupabase.from(TABLA_ASESORES).select('id, nombre, email, rol, pin_hash').eq('email', email);
-            const existente = (existentes && existentes.length) ? existentes[0] : null;
-            if (existente) {
-                if (existente.pin_hash === pinHash) {
-                    perfil.id = existente.id;
-                    perfil.nombre = existente.nombre || nombre;
-                    perfil.rol = existente.rol || 'asesor';
-                    guardadoRemoto = true;
-                } else {
-                    mostrarAlertaError('Ese correo ya está registrado con otro PIN. Ingresa el PIN correcto.');
-                    return;
-                }
+        // NUEVO: verifica si el nombre o el correo ya tienen un PIN asignado (Supabase + respaldo local)
+        const { porEmail, porNombre } = await buscarAsesorRegistrado(nombre, email);
+
+        if (porEmail) {
+            if (porEmail.pin_hash === pinHash) {
+                // El correo ya existe y el PIN es el correcto: se inicia sesión con la cuenta existente
+                perfil.id = porEmail.id || perfil.id;
+                perfil.nombre = porEmail.nombre || nombre;
+                perfil.email = porEmail.email || email;
+                perfil.rol = porEmail.rol || rol;
+                esInicioSesion = true;
+            } else {
+                mostrarAlertaError('Este correo ya tiene un PIN asignado y solo puedes iniciar sesión con ese PIN. Si deseas crear otra cuenta, usa un nombre y un correo diferentes.');
+                return;
             }
-        } catch (e) { /* tabla no disponible, se continúa sin errores */ }
+        } else if (porNombre) {
+            mostrarAlertaError('Este nombre ya está registrado con otro correo. Para crear otra cuenta debes usar un nombre y un correo diferentes.');
+            return;
+        }
 
-        // 2) Si el correo no existía, se guarda el perfil en la tabla
-        if (!guardadoRemoto) {
+        // Si es una cuenta nueva, se guarda el perfil en la tabla
+        if (!esInicioSesion) {
             try {
                 const { error } = await window.jkSupabase.from(TABLA_ASESORES).insert([{
                     id: perfil.id, nombre: perfil.nombre, email: perfil.email,
@@ -814,15 +904,17 @@ async function registrarAsesor() {
             } catch (e) { guardadoRemoto = false; }
         }
 
-        // 3) Respaldo local: la sesión y el PIN siempre funcionan en este equipo
+        // Respaldo local: la sesión y el PIN siempre funcionan en este equipo
         guardarAsesorLocal(perfil);
         cacheAsesores = null;
         guardarSesion(perfil);
         actualizarHeaderSesion();
         document.getElementById('form_sesion').reset();
         cerrarModalFormulario('modal_sesion');
-        if (guardadoRemoto) {
-            mostrarAlertaExito('¡Listo ' + perfil.nombre + '! Tu cuenta quedó activa. Usa tu PIN en los formularios.');
+        if (esInicioSesion) {
+            mostrarAlertaExito('¡Bienvenido de nuevo ' + perfil.nombre + '! Sesión iniciada como ' + formatearRol(perfil.rol) + '.');
+        } else if (guardadoRemoto) {
+            mostrarAlertaExito('¡Listo ' + perfil.nombre + '! Tu cuenta (' + formatearRol(perfil.rol) + ') quedó activa. Usa tu PIN en los formularios.');
         } else {
             mostrarAlertaExito('¡Listo ' + perfil.nombre + '! Tu cuenta quedó activa en este equipo. (La tabla asesores no respondió, se guardó localmente)');
         }
@@ -840,6 +932,12 @@ actualizarHeaderSesion();
 // Lógica de Navegación (Cards -> Abren modales animados independientes)
 document.querySelectorAll('.card').forEach(card => {
     card.addEventListener('click', () => {
+        // NUEVO: sin sesión iniciada no se puede diligenciar ningún formulario
+        if (!obtenerSesion()) {
+            mostrarAlertaError('Debes iniciar sesión para poder diligenciar los formularios.');
+            abrirModalSesion();
+            return;
+        }
         document.querySelectorAll('.card').forEach(item => item.classList.remove('active'));
         card.classList.add('active');
         const targetId = card.dataset.form;
@@ -1073,47 +1171,47 @@ const appCore = {
             msg += `*NOTA:*%0A Garantía de 30 días por defectos de fábrica.%0A Debe conservar este ticket y el producto con sellos intactos.`;
         }
 
-        datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/D/g, ''), numeroFactura: numFactura, falla: falla };
-        document.getElementById('resumenFactura').innerText = decodeURIComponent(msg.replace(/%0A/g, 'n'));
+        datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/\D/g, ''), numeroFactura: numFactura, falla: falla };
+        document.getElementById('resumenFactura').innerText = decodeURIComponent(msg.replace(/%0A/g, '\n'));
     },
     mostrarAvisoPDF: () => {
-    const aviso = document.createElement('div');
+        const aviso = document.createElement('div');
 
-    aviso.innerHTML = `
-        <i class="fa-solid fa-circle-check"></i>
-        PDF descargado correctamente
-    `;
+        aviso.innerHTML = `
+            <i class="fa-solid fa-circle-check"></i>
+            PDF descargado correctamente
+        `;
 
-    Object.assign(aviso.style, {
-        position: 'fixed',
-        top: '25px',
-        right: '25px',
-        background: '#198754',
-        color: '#ffffff',
-        padding: '14px 20px',
-        borderRadius: '10px',
-        fontSize: '15px',
-        fontWeight: '600',
-        zIndex: '99999',
-        boxShadow: '0 5px 20px rgba(0,0,0,0.25)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '9px'
-    });
+        Object.assign(aviso.style, {
+            position: 'fixed',
+            top: '25px',
+            right: '25px',
+            background: '#198754',
+            color: '#ffffff',
+            padding: '14px 20px',
+            borderRadius: '10px',
+            fontSize: '15px',
+            fontWeight: '600',
+            zIndex: '99999',
+            boxShadow: '0 5px 20px rgba(0,0,0,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '9px'
+        });
 
-    document.body.appendChild(aviso);
+        document.body.appendChild(aviso);
 
-    setTimeout(() => {
-        aviso.remove();
-    }, 3000);
-},
+        setTimeout(() => {
+            aviso.remove();
+        }, 3000);
+    },
     descargarPDF: () => {
         const elemento = document.getElementById('pdf-invoice');
         const num = document.getElementById('pdf-numero').innerText.replace('/', '-');
         html2pdf().set({ margin: [0.3, 0.3, 0.3, 0.3], filename: `Factura_JK_${num}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save().then(() => {
-    document.getElementById('modalFactura').style.display = 'none';
-    appCore.mostrarAvisoPDF();
-});
+            document.getElementById('modalFactura').style.display = 'none';
+            appCore.mostrarAvisoPDF();
+        });
     },
     enviarPorWhatsApp: () => {
         let num = datosFacturaActual.telefono || "";
@@ -1150,6 +1248,12 @@ function mostrarAlertaError(mensaje) {
 
 // FUNCIÓN GUARDAR OPERACIÓN
 async function guardarOperacion(prefijo, tipoOperacion) {
+    // NUEVO: sin sesión iniciada no se puede registrar ninguna operación
+    if (!obtenerSesion()) {
+        mostrarAlertaError('Debes iniciar sesión para poder registrar operaciones.');
+        return;
+    }
+
     // NUEVO: Validación del PIN del asesor (no altera la lógica original)
     const asesorValor = (document.getElementById(`${prefijo}_asesor`)?.value || '').trim();
     if (!asesorValor) {
@@ -1215,8 +1319,8 @@ async function guardarOperacion(prefijo, tipoOperacion) {
             payment_method: document.getElementById(`${prefijo}_metodo_pago`).value,
             payment_type: tipoPago,
             imagen_url: urlImagen || null,
-imagen_url_2: urlImagen2 || null,
-imagen_url_3: urlImagen3 || null,
+            imagen_url_2: urlImagen2 || null,
+            imagen_url_3: urlImagen3 || null,
             estado: (abono < total) ? 'Pendiente' : 'Completado',
             estado_taller: (prefijo === 'rep') ? document.getElementById('rep_estado_taller').value : 'N/A'
         };
