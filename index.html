@@ -124,6 +124,17 @@ select option { background: #171a21; }
 .camera { padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(18,216,196,.25); background: rgba(18,216,196,.08); color: #12d8c4; font-family: 'Poppins', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .preview { width: 180px; height: 90px; border: 1px dashed rgba(18,216,196,.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #596170; font-size: 11px; overflow: hidden; }
 .preview img { width: 100%; height: 100%; object-fit: cover; }
+/* NUEVO: tres evidencias */
+.evidence-multi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; width: 100%; }
+.evidence-slot { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.evidence-slot .camera { width: 100%; justify-content: center; font-size: 11.5px; padding: 10px 8px; }
+.evidence-slot .preview { width: 100%; height: 100px; }
+.evidence-slot small { color: #7d8594; font-size: 10.5px; }
+
+/* NUEVO: garantía personalizada */
+.garantia-box { display: flex; flex-direction: column; gap: 10px; }
+.garantia-box textarea { min-height: 120px; }
+.garantia-hint { color: #7d8594; font-size: 10.5px; line-height: 1.5; }
 
 /* TOTALES */
 .total-box { margin-top: 25px; padding: 17px 20px; border-radius: 15px; border: 1px solid rgba(18,216,196,.11); background: #101319; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
@@ -158,6 +169,7 @@ select option { background: #171a21; }
 .pdf-totals div { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;}
 .pdf-totals div.neto { font-weight: bold; border-top: 1px solid #ccc; padding-top: 8px; font-size: 16px;}
 .pdf-garantia { clear: both; margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; font-size: 11px; color: #444; text-align: justify; line-height: 1.4; }
+.pdf-garantia #pdf-garantia-texto { white-space: pre-wrap; }
 .pdf-signatures { clear: both; margin-top: 50px; display: flex; justify-content: space-between; }
 .signature-box { width: 40%; text-align: center; border-top: 1px solid #000; padding-top: 10px; font-size: 14px; }
 
@@ -245,6 +257,7 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     .modal-close { top: 10px; right: 10px; width: 34px; height: 34px; }
     .asesor-pin-row { flex-direction: column; }
     .btn-pin { width: 100%; }
+    .evidence-multi { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -324,12 +337,42 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
                 <div class="field"><label>Método de pago</label><select id="acc_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="acc_tipo_pago" required onchange="appCore.toggleAbono('acc')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
                 <div class="field full" id="div_acc_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="acc_abono" oninput="appCore.actualizarTotales('acc')"></div>
+
+                <!-- NUEVO: TÉRMINOS DE GARANTÍA EDITABLES -->
                 <div class="field full">
-                    <label>Evidencia</label>
+                    <label>Términos de garantía en la factura <i class="fa-solid fa-file-pen" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <div class="garantia-box">
+                        <select id="acc_garantia_tipo" onchange="appCore.toggleGarantia('acc')">
+                            <option value="Defecto">Usar términos de garantía por defecto</option>
+                            <option value="Personalizada">Escribir términos de garantía personalizados</option>
+                        </select>
+                        <div id="div_acc_garantia" style="display: none;">
+                            <textarea id="acc_garantia_texto" placeholder="Escribe exactamente el texto que quieres que aparezca en la sección TÉRMINOS DE GARANTÍA de la factura..."></textarea>
+                        </div>
+                        <span class="garantia-hint">El texto se imprimirá en la factura y el PDF tal cual lo escribas. Si eliges "por defecto", se usarán los términos originales.</span>
+                    </div>
+                </div>
+
+                <div class="field full">
+                    <label>Evidencia (hasta 3 fotos)</label>
                     <div class="evidence">
-                        <input type="file" id="acc_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc')">
-                        <button type="button" class="camera" onclick="document.getElementById('acc_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
-                        <div class="preview" id="preview_acc">Vista previa</div>
+                        <div class="evidence-multi">
+                            <div class="evidence-slot">
+                                <input type="file" id="acc_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc')">
+                                <button type="button" class="camera" onclick="document.getElementById('acc_evidencia').click()"><i class="fa-solid fa-camera"></i> Evidencia 1</button>
+                                <div class="preview" id="preview_acc">Vista previa 1</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="acc_evidencia2" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc_2')">
+                                <button type="button" class="camera" onclick="document.getElementById('acc_evidencia2').click()"><i class="fa-solid fa-camera"></i> Evidencia 2</button>
+                                <div class="preview" id="preview_acc_2">Vista previa 2</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="acc_evidencia3" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_acc_3')">
+                                <button type="button" class="camera" onclick="document.getElementById('acc_evidencia3').click()"><i class="fa-solid fa-camera"></i> Evidencia 3</button>
+                                <div class="preview" id="preview_acc_3">Vista previa 3</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,12 +423,42 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
                 <div class="field"><label>Método de pago</label><select id="cel_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="cel_tipo_pago" required onchange="appCore.toggleAbono('cel')"><option value="Completo">Pago completo</option><option value="Abono">Abono (Parcial)</option></select></div>
                 <div class="field full" id="div_cel_abono" style="display: none;"><label>Valor Abonado</label><input type="number" id="cel_abono" oninput="appCore.actualizarTotales('cel')"></div>
+
+                <!-- NUEVO: TÉRMINOS DE GARANTÍA EDITABLES -->
                 <div class="field full">
-                    <label>Evidencia</label>
+                    <label>Términos de garantía en la factura <i class="fa-solid fa-file-pen" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <div class="garantia-box">
+                        <select id="cel_garantia_tipo" onchange="appCore.toggleGarantia('cel')">
+                            <option value="Defecto">Usar términos de garantía por defecto</option>
+                            <option value="Personalizada">Escribir términos de garantía personalizados</option>
+                        </select>
+                        <div id="div_cel_garantia" style="display: none;">
+                            <textarea id="cel_garantia_texto" placeholder="Escribe exactamente el texto que quieres que aparezca en la sección TÉRMINOS DE GARANTÍA de la factura..."></textarea>
+                        </div>
+                        <span class="garantia-hint">El texto se imprimirá en la factura y el PDF tal cual lo escribas. Si eliges "por defecto", se usarán los términos originales.</span>
+                    </div>
+                </div>
+
+                <div class="field full">
+                    <label>Evidencia (hasta 3 fotos)</label>
                     <div class="evidence">
-                        <input type="file" id="cel_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_cel')">
-                        <button type="button" class="camera" onclick="document.getElementById('cel_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
-                        <div class="preview" id="preview_cel">Vista previa</div>
+                        <div class="evidence-multi">
+                            <div class="evidence-slot">
+                                <input type="file" id="cel_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_cel')">
+                                <button type="button" class="camera" onclick="document.getElementById('cel_evidencia').click()"><i class="fa-solid fa-camera"></i> Evidencia 1</button>
+                                <div class="preview" id="preview_cel">Vista previa 1</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="cel_evidencia2" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_cel_2')">
+                                <button type="button" class="camera" onclick="document.getElementById('cel_evidencia2').click()"><i class="fa-solid fa-camera"></i> Evidencia 2</button>
+                                <div class="preview" id="preview_cel_2">Vista previa 2</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="cel_evidencia3" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_cel_3')">
+                                <button type="button" class="camera" onclick="document.getElementById('cel_evidencia3').click()"><i class="fa-solid fa-camera"></i> Evidencia 3</button>
+                                <div class="preview" id="preview_cel_3">Vista previa 3</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -431,12 +504,42 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
                 <div class="field"><label>Método de pago</label><select id="rep_metodo_pago" required><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
                 <div class="field"><label>Tipo de pago</label><select id="rep_tipo_pago" required onchange="appCore.toggleAbono('rep')"><option value="Completo">Pago completo (100%)</option><option value="Abono">Dejar Abono (Anticipo)</option></select></div>
                 <div class="field full" id="div_rep_abono" style="display: none;"><label>Valor del Anticipo / Abono</label><input type="number" id="rep_abono" oninput="appCore.actualizarTotales('rep')"></div>
+
+                <!-- NUEVO: TÉRMINOS DE GARANTÍA EDITABLES -->
                 <div class="field full">
-                    <label>Evidencia</label>
+                    <label>Términos de garantía en la factura <i class="fa-solid fa-file-pen" style="color:#12d8c4; margin-left:5px;"></i></label>
+                    <div class="garantia-box">
+                        <select id="rep_garantia_tipo" onchange="appCore.toggleGarantia('rep')">
+                            <option value="Defecto">Usar términos de garantía por defecto</option>
+                            <option value="Personalizada">Escribir términos de garantía personalizados</option>
+                        </select>
+                        <div id="div_rep_garantia" style="display: none;">
+                            <textarea id="rep_garantia_texto" placeholder="Escribe exactamente el texto que quieres que aparezca en la sección TÉRMINOS DE GARANTÍA de la factura..."></textarea>
+                        </div>
+                        <span class="garantia-hint">El texto se imprimirá en la factura y el PDF tal cual lo escribas. Si eliges "por defecto", se usarán los términos originales.</span>
+                    </div>
+                </div>
+
+                <div class="field full">
+                    <label>Evidencia (hasta 3 fotos)</label>
                     <div class="evidence">
-                        <input type="file" id="rep_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_rep')">
-                        <button type="button" class="camera" onclick="document.getElementById('rep_evidencia').click()"><i class="fa-solid fa-camera"></i> Tomar evidencia</button>
-                        <div class="preview" id="preview_rep">Vista previa</div>
+                        <div class="evidence-multi">
+                            <div class="evidence-slot">
+                                <input type="file" id="rep_evidencia" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_rep')">
+                                <button type="button" class="camera" onclick="document.getElementById('rep_evidencia').click()"><i class="fa-solid fa-camera"></i> Evidencia 1</button>
+                                <div class="preview" id="preview_rep">Vista previa 1</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="rep_evidencia2" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_rep_2')">
+                                <button type="button" class="camera" onclick="document.getElementById('rep_evidencia2').click()"><i class="fa-solid fa-camera"></i> Evidencia 2</button>
+                                <div class="preview" id="preview_rep_2">Vista previa 2</div>
+                            </div>
+                            <div class="evidence-slot">
+                                <input type="file" id="rep_evidencia3" accept="image/*" capture="environment" style="display: none;" onchange="appCore.mostrarPreview(this, 'preview_rep_3')">
+                                <button type="button" class="camera" onclick="document.getElementById('rep_evidencia3').click()"><i class="fa-solid fa-camera"></i> Evidencia 3</button>
+                                <div class="preview" id="preview_rep_3">Vista previa 3</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -481,9 +584,11 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     <div class="pdf-header"><h1>ACCESORIOS JK</h1><p>NIT:1005715210 Comprobante de Operación Comercial REGIMEN SIMPLIFICADO</p></div>
     <div class="pdf-row"><div><strong>Cliente:</strong> <span id="pdf-cliente"></span></div><div><strong>Fecha:</strong> <span id="pdf-fecha"></span></div></div>
     <div class="pdf-row"><div><strong>Teléfono:</strong> <span id="pdf-telefono"></span></div><div><strong>Factura N°:</strong> <span id="pdf-numero"></span></div></div>
+    <!-- NUEVO: IMEI en la factura -->
+    <div class="pdf-row" id="pdf-imei-row"><div><strong>IMEI / Serial:</strong> <span id="pdf-imei"></span></div></div>
     <table class="pdf-table"><thead><tr><th>Descripción</th><th>Cant</th><th>V. Unitario</th><th>Total</th></tr></thead><tbody><tr><td id="pdf-desc"></td><td id="pdf-cant"></td><td id="pdf-vunit"></td><td id="pdf-vtotal"></td></tr></tbody></table>
     <div class="pdf-totals"><div><span>Subtotal:</span><span id="pdf-subtotal"></span></div><div><span>Tipo de Pago:</span><span id="pdf-tipopago"></span></div><div><span>Valor Abonado:</span><span id="pdf-abono"></span></div><div class="neto"><span>SALDO PENDIENTE:</span><span id="pdf-pendiente"></span></div></div>
-    <div class="pdf-garantia"><p><strong>TÉRMINOS DE GARANTÍA:</strong> La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.</p><div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>DIRECCIÓN:</strong> Calle 14 # 2-67 Centro Ibagué-Tolima | <strong>SERVICIOS:</strong> Técnico profesional y telefonía.</div></div>
+    <div class="pdf-garantia"><p><strong>TÉRMINOS DE GARANTÍA:</strong> <span id="pdf-garantia-texto">La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.</span></p><div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>DIRECCIÓN:</strong> Calle 14 # 2-67 Centro Ibagué-Tolima | <strong>SERVICIOS:</strong> Técnico profesional y telefonía.</div></div>
     <div class="pdf-signatures"><div class="signature-box">Recibí Conforme<br><br><span id="pdf-firma-cliente"></span></div><div class="signature-box">Autorizado<br><br>ACCESORIOS JK</div></div>
 </div>
 
@@ -497,6 +602,9 @@ window.jkSupabase = window.jkSupabase || window.supabase.createClient(
 const NOMBRE_TABLA = 'operaciones';
 let datosFacturaActual = {};
 const PREFIJO_FACTURA = "JK/";
+
+// NUEVO: texto de garantía por defecto (el original de la factura)
+const GARANTIA_POR_DEFECTO = "La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.";
 
 // ============================================================
 // NUEVO: INICIO DE SESIÓN / REGISTRO DE ASESOR CON PIN (UNA SOLA VEZ)
@@ -800,6 +908,33 @@ async function subirImagenSupabase(inputFile) {
     return publicUrlData.publicUrl;
 }
 
+// NUEVO: obtiene el texto de garantía según la elección del usuario en el formulario
+function obtenerTextoGarantia(prefijo) {
+    const tipo = document.getElementById(`${prefijo}_garantia_tipo`)?.value || 'Defecto';
+    if (tipo === 'Personalizada') {
+        const texto = (document.getElementById(`${prefijo}_garantia_texto`)?.value || '').trim();
+        if (texto) return texto;
+    }
+    return GARANTIA_POR_DEFECTO;
+}
+
+// NUEVO: obtiene el/los IMEI según el formulario
+function obtenerTextoImei(prefijo) {
+    if (prefijo === 'acc') {
+        return (document.getElementById('acc_imei')?.value || '').trim() || 'N/A';
+    } else if (prefijo === 'cel') {
+        const i1 = (document.getElementById('cel_imei')?.value || '').trim();
+        const i2 = (document.getElementById('cel_imei2')?.value || '').trim();
+        if (i1 && i2) return `IMEI 1: ${i1} | IMEI 2: ${i2}`;
+        if (i1) return `IMEI 1: ${i1}`;
+        if (i2) return `IMEI 2: ${i2}`;
+        return 'N/A';
+    } else if (prefijo === 'rep') {
+        return (document.getElementById('rep_imei')?.value || '').trim() || 'N/A';
+    }
+    return 'N/A';
+}
+
 const appCore = {
     formatoMoneda: (num) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(num),
     
@@ -836,6 +971,20 @@ const appCore = {
         if (tipo === 'Abono') { divAbono.style.display = 'block'; } 
         else { divAbono.style.display = 'none'; inputAbono.value = ''; }
         appCore.actualizarTotales(prefijo);
+    },
+
+    // NUEVO: muestra u oculta el textarea de garantía personalizada
+    toggleGarantia: (prefijo) => {
+        const tipo = document.getElementById(`${prefijo}_garantia_tipo`).value;
+        const div = document.getElementById(`div_${prefijo}_garantia`);
+        const txt = document.getElementById(`${prefijo}_garantia_texto`);
+        if (tipo === 'Personalizada') {
+            div.style.display = 'block';
+            if (!txt.value) txt.value = GARANTIA_POR_DEFECTO;
+            txt.focus();
+        } else {
+            div.style.display = 'none';
+        }
     },
 
     actualizarTotales: (prefijo) => {
@@ -893,6 +1042,11 @@ const appCore = {
         const fechaStr = ahora.toLocaleDateString('es-CO');
         const horaStr = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
 
+        // NUEVO: garantía e IMEI para la factura
+        const textoGarantia = obtenerTextoGarantia(prefijo);
+        const garantiaPersonalizada = (document.getElementById(`${prefijo}_garantia_tipo`)?.value === 'Personalizada');
+        const textoImei = obtenerTextoImei(prefijo);
+
         const tablaCuerpo = document.querySelector('.pdf-table tbody');
         tablaCuerpo.innerHTML = `<tr><td style="color: #000; text-align: left;">${desc}</td><td style="color: #000; text-align: left;">${cantidadItems}</td><td style="color: #000; text-align: left;">${appCore.formatoMoneda(precioUnitario)}</td><td style="color: #000; text-align: left;">${appCore.formatoMoneda(totalOperacion)}</td></tr>`;
 
@@ -900,17 +1054,24 @@ const appCore = {
         document.getElementById('pdf-telefono').innerText = telefono;
         document.getElementById('pdf-fecha').innerText = fechaStr;
         document.getElementById('pdf-numero').innerText = numFactura;
+        document.getElementById('pdf-imei').innerText = textoImei;
         document.getElementById('pdf-subtotal').innerText = appCore.formatoMoneda(totalOperacion);
         document.getElementById('pdf-tipopago').innerText = tipoPago;
         document.getElementById('pdf-abono').innerText = appCore.formatoMoneda(abono);
         document.getElementById('pdf-pendiente').innerText = appCore.formatoMoneda(pendiente < 0 ? 0 : pendiente);
+        document.getElementById('pdf-garantia-texto').innerText = textoGarantia;
         document.getElementById('pdf-firma-cliente').innerHTML = `${cliente}<br>(Asesor: ${asesor})`;
 
-        let msg = `*ACCESORIOS JK*%0A*NIT:* 1005715210%0A*RÉGIMEN:* SIMPLIFICADO%0A*SERVICIO TÉCNICO Y TELEFONÍA*%0A*DIRECCIÓN:* Calle 114 %232 67 Centro Ibagué - Tolima%0A%0A*COMPROBANTE DE COMPRA*%0A--------------------------------%0A*Comprobante N°:* ${numFactura}%0A*Fecha:* ${fechaStr}%0A*Hora:* ${horaStr}%0A%0A*DATOS DEL CLIENTE:*%0A*Cliente:* ${encodeURIComponent(cliente)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A%0A*DETALLE DE LA OPERACIÓN:*%0A*Equipo:* ${encodeURIComponent(desc.replace("Reparación: ", ""))}%0A`;
+        let msg = `*ACCESORIOS JK*%0A*NIT:* 1005715210%0A*RÉGIMEN:* SIMPLIFICADO%0A*SERVICIO TÉCNICO Y TELEFONÍA*%0A*DIRECCIÓN:* Calle 114 %232 67 Centro Ibagué - Tolima%0A%0A*COMPROBANTE DE COMPRA*%0A--------------------------------%0A*Comprobante N°:* ${numFactura}%0A*Fecha:* ${fechaStr}%0A*Hora:* ${horaStr}%0A%0A*DATOS DEL CLIENTE:*%0A*Cliente:* ${encodeURIComponent(cliente)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A%0A*DETALLE DE LA OPERACIÓN:*%0A*Equipo:* ${encodeURIComponent(desc.replace("Reparación: ", ""))}%0A*IMEI / Serial:* ${encodeURIComponent(textoImei)}%0A`;
         if (prefijo === 'rep') { msg += `*Descripción de la falla:*%0A${encodeURIComponent(falla)}%0A`; } else { msg += `*Cantidad:* ${cantidadItems}%0A`; }
         msg += `%0A*TOTAL A PAGAR:* ${appCore.formatoMoneda(totalOperacion)}%0A`;
         if (tipoPago === 'Abono') { msg += `*Tipo de pago:* Abono%0A*Abono realizado:* ${appCore.formatoMoneda(abono)}%0A*Saldo pendiente:* ${appCore.formatoMoneda(pendiente)}%0A`; } else { msg += `*Tipo de pago:* Pago completo%0A*Total pagado:* ${appCore.formatoMoneda(totalOperacion)}%0A`; }
-        msg += `*Método de pago:* ${encodeURIComponent(metodoPago)}%0A*Nombre de asesor:* ${encodeURIComponent(asesor)}%0A%0A--------------------------------%0A*¡GRACIAS POR SU COMPRA!*%0A%0A*NOTA:*%0A Garantía de 30 días por defectos de fábrica.%0A Debe conservar este ticket y el producto con sellos intactos.`;
+        msg += `*Método de pago:* ${encodeURIComponent(metodoPago)}%0A*Nombre de asesor:* ${encodeURIComponent(asesor)}%0A%0A--------------------------------%0A*¡GRACIAS POR SU COMPRA!*%0A%0A`;
+        if (garantiaPersonalizada) {
+            msg += `*TÉRMINOS DE GARANTÍA:*%0A${encodeURIComponent(textoGarantia).replace(/%0A/g, '%0A')}`;
+        } else {
+            msg += `*NOTA:*%0A Garantía de 30 días por defectos de fábrica.%0A Debe conservar este ticket y el producto con sellos intactos.`;
+        }
 
         datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/D/g, ''), numeroFactura: numFactura, falla: falla };
         document.getElementById('resumenFactura').innerText = decodeURIComponent(msg.replace(/%0A/g, 'n'));
@@ -974,8 +1135,13 @@ async function guardarOperacion(prefijo, tipoOperacion) {
         const abono = tipoPago === 'Abono' ? (parseFloat(document.getElementById(`${prefijo}_abono`)?.value) || 0) : total;
         const numFactura = datosFacturaActual.numeroFactura || await obtenerSiguienteNumeroFactura();
         
+        // NUEVO: subida de hasta 3 evidencias
         const inputEvidencia = document.getElementById(`${prefijo}_evidencia`);
+        const inputEvidencia2 = document.getElementById(`${prefijo}_evidencia2`);
+        const inputEvidencia3 = document.getElementById(`${prefijo}_evidencia3`);
         const urlImagen = await subirImagenSupabase(inputEvidencia);
+        const urlImagen2 = await subirImagenSupabase(inputEvidencia2);
+        const urlImagen3 = await subirImagenSupabase(inputEvidencia3);
 
         let descripcion = "", equipo = null, imei = null, imei2 = null, falla = null;
         let inputProducto = null;
@@ -1014,12 +1180,28 @@ async function guardarOperacion(prefijo, tipoOperacion) {
             asesor: document.getElementById(`${prefijo}_asesor`)?.value || "N/A",
             payment_method: document.getElementById(`${prefijo}_metodo_pago`).value,
             payment_type: tipoPago,
-            imagen_url: urlImagen,
+            imagen_url: urlImagen || null,
+imagen_url_2: urlImagen2 || null,
+imagen_url_3: urlImagen3 || null,
             estado: (abono < total) ? 'Pendiente' : 'Completado',
             estado_taller: (prefijo === 'rep') ? document.getElementById('rep_estado_taller').value : 'N/A'
         };
 
-        const { error } = await window.jkSupabase.from(NOMBRE_TABLA).insert([data]);
+        // NUEVO: se intenta guardar las evidencias 2 y 3 en columnas propias;
+        // si la tabla no tiene esas columnas, se guardan todas las URLs en imagen_url separadas por " | ".
+        let error = null;
+        if (urlImagen2 || urlImagen3) {
+            const dataExtendida = { ...data, imagen_url_2: urlImagen2, imagen_url_3: urlImagen3 };
+            const res1 = await window.jkSupabase.from(NOMBRE_TABLA).insert([dataExtendida]);
+            if (res1.error) {
+                data.imagen_url = [urlImagen, urlImagen2, urlImagen3].filter(Boolean).join(' | ') || null;
+                const res2 = await window.jkSupabase.from(NOMBRE_TABLA).insert([data]);
+                error = res2.error;
+            }
+        } else {
+            const res = await window.jkSupabase.from(NOMBRE_TABLA).insert([data]);
+            error = res.error;
+        }
         if (error) throw error;
 
         if (inputProducto && inputProducto.dataset.idInventario) {
@@ -1035,7 +1217,11 @@ async function guardarOperacion(prefijo, tipoOperacion) {
         mostrarAlertaExito(`${tipoOperacion} registrado y stock actualizado con éxito.`);
         document.getElementById(`form_${tipoOperacion.toLowerCase()}`).reset();
         appCore.actualizarTotales(prefijo);
-        document.getElementById(`preview_${prefijo}`).innerHTML = "Vista previa";
+        document.getElementById(`preview_${prefijo}`).innerHTML = "Vista previa 1";
+        document.getElementById(`preview_${prefijo}_2`).innerHTML = "Vista previa 2";
+        document.getElementById(`preview_${prefijo}_3`).innerHTML = "Vista previa 3";
+        const divGar = document.getElementById(`div_${prefijo}_garantia`);
+        if (divGar) divGar.style.display = 'none';
         datosFacturaActual = {};
 
     } catch (e) {
