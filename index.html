@@ -262,6 +262,79 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     margin-top: 0;
 }
 
+/* ============ NUEVO: CONTABILIDAD ============ */
+.btn-contabilidad { width: 100%; max-width: 840px; margin: 0 auto 25px; height: 54px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 16px; border: 1px solid rgba(18,216,196,.35); background: linear-gradient(135deg, rgba(18,216,196,.14), rgba(18,216,196,.04)); color: #12d8c4; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .4px; cursor: pointer; transition: .25s; }
+.btn-contabilidad:hover { transform: translateY(-3px); border-color: #12d8c4; box-shadow: 0 12px 30px rgba(18,216,196,.18); background: rgba(18,216,196,.2); }
+.btn-contabilidad i { font-size: 16px; }
+.conta-content { max-width: 960px; }
+.conta-wrap { padding: 32px 30px 28px; }
+.conta-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.conta-seg { display: inline-flex; background: #101319; border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+.conta-seg button { border: 0; background: transparent; color: #7d8594; font-family: 'Poppins', sans-serif; font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: 9px; cursor: pointer; transition: .2s; }
+.conta-seg button.on { background: rgba(18,216,196,.15); color: #12d8c4; }
+.conta-btn { height: 38px; padding: 0 14px; border-radius: 11px; border: 1px solid rgba(18,216,196,.35); background: rgba(18,216,196,.10); color: #12d8c4; font-family: 'Poppins', sans-serif; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: .2s; display: inline-flex; align-items: center; gap: 7px; }
+.conta-btn:hover { background: rgba(18,216,196,.22); }
+.conta-btn-pdf { margin-left: auto; background: #ff4757; border-color: #ff4757; color: #fff; }
+.conta-btn-pdf:hover { background: #e63946; }
+.conta-periodo-label { color: #7d8594; font-size: 11.5px; margin-bottom: 16px; }
+.conta-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.kpi { padding: 16px; border-radius: 16px; background: #101319; border: 1px solid rgba(18,216,196,.10); display: flex; flex-direction: column; gap: 4px; }
+.kpi span { color: #8d95a5; font-size: 11.5px; }
+.kpi strong { font-size: 19px; color: #fff; }
+.kpi small { color: #596170; font-size: 10px; }
+.c-ok { color: #12d8c4 !important; }
+.c-bad { color: #ff5e5e !important; }
+.c-warn { color: #ffb84d !important; }
+.conta-sec { padding: 18px; border-radius: 16px; background: #101319; border: 1px solid rgba(255,255,255,.06); margin-bottom: 20px; }
+.conta-sec h4 { font-size: 14px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: #fff; }
+.conta-sec h4 i { color: #12d8c4; }
+.conta-sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+.conta-sec-head h4 { margin: 0; }
+.conta-tipos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.conta-tipo { padding: 12px; border-radius: 12px; background: #171a21; display: flex; flex-direction: column; gap: 4px; font-size: 11.5px; color: #bfc6d2; }
+.conta-tipo strong { color: #12d8c4; font-size: 14px; }
+.conta-bars { display: flex; align-items: flex-end; gap: 8px; height: 200px; padding: 10px 6px 0; border-bottom: 1px solid rgba(255,255,255,.08); overflow-x: auto; }
+.conta-bar-col { flex: 1; min-width: 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+.conta-bar-pair { display: flex; align-items: flex-end; gap: 3px; height: 150px; }
+.conta-bar { width: 11px; border-radius: 6px 6px 0 0; transition: height .5s cubic-bezier(.22,1,.36,1); }
+.conta-bar.ok { background: linear-gradient(#22f5dd, #12d8c4); }
+.conta-bar.bad { background: linear-gradient(#ff7b7b, #ff5e5e); }
+.conta-bar-col small { color: #7d8594; font-size: 9px; text-align: center; white-space: nowrap; }
+.conta-leyenda { display: flex; gap: 14px; font-size: 11px; color: #7d8594; margin-top: 10px; }
+.conta-leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; }
+.conta-table-wrap { overflow-x: auto; margin-top: 14px; }
+.conta-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.conta-table th, .conta-table td { padding: 9px 10px; text-align: right; border-bottom: 1px solid rgba(255,255,255,.05); white-space: nowrap; }
+.conta-table th { color: #7d8594; font-weight: 600; font-size: 10.5px; }
+.conta-table th:first-child, .conta-table td:first-child { text-align: left; }
+.conta-table td { color: #dfe3ea; }
+.conta-egreso-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.conta-egreso-grid .submit { grid-column: 1 / -1; margin-top: 6px; }
+
+/* PDF CONTABLE (se genera fuera de pantalla) */
+.conta-pdf { position: absolute; left: -10000px; top: 0; width: 750px; background: #ffffff; color: #111111; font-family: Arial, sans-serif; font-size: 12px; padding: 24px; }
+.conta-pdf-head { display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #12d8c4; padding-bottom: 14px; margin-bottom: 6px; }
+.conta-pdf-logo { width: 70px; height: 70px; border-radius: 50%; background: #12d8c4; color: #101319; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.conta-pdf-head h1 { font-size: 22px; margin: 0; color: #000; }
+.conta-pdf-head p { margin: 3px 0 0; color: #444; font-size: 11px; }
+.conta-pdf-meta { margin-left: auto; text-align: right; }
+.conta-pdf-meta p { margin: 2px 0 0; font-size: 11px; color: #333; }
+.conta-pdf h2 { font-size: 13px; color: #0b5f58; margin: 18px 0 8px; text-transform: uppercase; border-bottom: 2px solid #12d8c4; padding-bottom: 4px; }
+.conta-pdf table { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 11px; }
+.conta-pdf th, .conta-pdf td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+.conta-pdf th { background: #eef9f8; color: #0b5f58; }
+.conta-pdf .num { text-align: right; }
+.conta-pdf .neto td { font-weight: bold; background: #f5f7f9; }
+.conta-pdf .vacio { text-align: center; color: #777; }
+.conta-pdf .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.conta-pdf .kpi-box { border: 1px solid #ddd; border-radius: 6px; padding: 8px; }
+.conta-pdf .kpi-box span { display: block; color: #666; font-size: 10px; }
+.conta-pdf .kpi-box strong { font-size: 14px; color: #000; }
+.conta-pdf .sec { page-break-inside: avoid; }
+.conta-pdf .firmas { display: flex; justify-content: space-between; margin-top: 50px; }
+.conta-pdf .firma { width: 40%; text-align: center; border-top: 1px solid #000; padding-top: 6px; font-size: 11px; }
+.conta-pdf .pie { margin-top: 18px; font-size: 9.5px; color: #666; text-align: center; border-top: 1px solid #eee; padding-top: 8px; }
+
 @media(max-width: 700px) {
     .container { padding: 22px 14px; }
     .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 100%; }
@@ -282,6 +355,11 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     .evidence-multi { grid-template-columns: 1fr; }
     .sesion-banner { flex-wrap: wrap; }
     .btn-cerrar-sesion { margin-left: 0; }
+    .conta-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .conta-tipos { grid-template-columns: 1fr; }
+    .conta-egreso-grid { grid-template-columns: 1fr; }
+    .conta-wrap { padding: 28px 18px 20px; }
+    .conta-btn-pdf { margin-left: 0; width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -323,6 +401,98 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
         <div class="card" data-form="form_reparacion">
             <div class="icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
             <div class="card-text"><h3>Reparación</h3><p>Ingreso de equipo</p></div>
+        </div>
+        </div>
+        <!-- NUEVO: botón horizontal de contabilidad -->
+        <button type="button" class="btn-contabilidad" onclick="abrirContabilidad()"><i class="fa-solid fa-scale-balanced"></i> CONTABILIDAD</button>
+    </div>
+</div>
+
+<!-- MODAL: CONTABILIDAD (NUEVO) -->
+<div class="form-modal" id="modal_contabilidad">
+    <div class="form-modal-content conta-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_contabilidad')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="conta-wrap">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div><h3>Contabilidad</h3><p>Ingresos, egresos, pagos electrónicos y balance general.</p></div>
+            </div>
+
+            <div class="conta-toolbar">
+                <div class="conta-seg" id="contaPeriodoSeg">
+                    <button type="button" data-periodo="hoy" onclick="contaSetPeriodo('hoy')">Hoy</button>
+                    <button type="button" data-periodo="semana" class="on" onclick="contaSetPeriodo('semana')">Semana</button>
+                    <button type="button" data-periodo="mes" onclick="contaSetPeriodo('mes')">Mes</button>
+                    <button type="button" data-periodo="todo" onclick="contaSetPeriodo('todo')">Todo</button>
+                </div>
+                <button type="button" class="conta-btn" onclick="contaCargar()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                <button type="button" class="conta-btn conta-btn-pdf" onclick="contaGenerarPDF()"><i class="fa-solid fa-file-pdf"></i> Reporte PDF</button>
+            </div>
+            <div class="conta-periodo-label" id="contaPeriodoLabel">Cargando...</div>
+
+            <div class="conta-kpis">
+                <div class="kpi"><span>Ingresos</span><strong id="kpi_ingresos" class="c-ok">$0</strong><small id="kpi_ingresos_n">0 operaciones</small></div>
+                <div class="kpi"><span>Egresos</span><strong id="kpi_egresos" class="c-bad">$0</strong><small id="kpi_egresos_n">0 registros</small></div>
+                <div class="kpi"><span>Balance neto</span><strong id="kpi_balance" class="c-ok">$0</strong><small>Ingresos - Egresos</small></div>
+                <div class="kpi"><span>Pagos electrónicos</span><strong id="kpi_electronicos">$0</strong><small>Transferencias y tarjeta</small></div>
+                <div class="kpi"><span>Efectivo recibido</span><strong id="kpi_efectivo">$0</strong><small>Ingreso en caja</small></div>
+                <div class="kpi"><span>Por cobrar</span><strong id="kpi_pendiente" class="c-warn">$0</strong><small>Saldos pendientes</small></div>
+            </div>
+
+            <div class="conta-sec">
+                <h4><i class="fa-solid fa-layer-group"></i> Ingresos por tipo de operación</h4>
+                <div class="conta-tipos" id="conta_tipos"></div>
+            </div>
+
+            <div class="conta-sec">
+                <div class="conta-sec-head">
+                    <h4><i class="fa-solid fa-chart-column"></i> Histórico del balance</h4>
+                    <div class="conta-seg" id="contaHistSeg">
+                        <button type="button" data-hist="dia" class="on" onclick="contaSetHist('dia')">Por día</button>
+                        <button type="button" data-hist="semana" onclick="contaSetHist('semana')">Por semana</button>
+                    </div>
+                </div>
+                <div class="conta-bars" id="contaBars"></div>
+                <div class="conta-leyenda">
+                    <span><i style="background:#12d8c4"></i>Ingresos</span>
+                    <span><i style="background:#ff5e5e"></i>Egresos</span>
+                </div>
+                <div class="conta-table-wrap">
+                    <table class="conta-table">
+                        <thead><tr><th>Periodo</th><th>Ingresos</th><th>Egresos</th><th>Electrónicos</th><th>Balance</th></tr></thead>
+                        <tbody id="contaHistBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="conta-sec">
+                <h4><i class="fa-solid fa-money-bill-transfer"></i> Registrar egreso</h4>
+                <form id="form_egreso" class="conta-egreso-grid" onsubmit="event.preventDefault(); contaGuardarEgreso();">
+                    <div class="field full"><label>Concepto</label><input type="text" id="eg_concepto" placeholder="Ej: Pago de arriendo" required></div>
+                    <div class="field"><label>Categoría</label>
+                        <select id="eg_categoria" required>
+                            <option value="Arriendo">Arriendo</option>
+                            <option value="Servicios">Servicios públicos</option>
+                            <option value="Proveedores">Proveedores / Compras</option>
+                            <option value="Nómina">Nómina</option>
+                            <option value="Impuestos">Impuestos</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Monto</label><input type="number" id="eg_monto" min="1" required></div>
+                    <div class="field"><label>Método de pago</label>
+                        <select id="eg_metodo" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Fecha</label><input type="date" id="eg_fecha" required></div>
+                    <div class="field full"><label>Notas (opcional)</label><input type="text" id="eg_notas"></div>
+                    <button type="submit" class="submit" id="btnEgreso">Registrar egreso</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -1369,6 +1539,344 @@ async function guardarOperacion(prefijo, tipoOperacion) {
         botonSubmit.innerText = "Registrar Venta";
         botonSubmit.disabled = false;
     }
+}
+
+// ============================================================
+// NUEVO: CONTABILIDAD
+// Lee la tabla 'operaciones' (ingresos, pagos electrónicos, por cobrar)
+// y la tabla 'egresos' (ver supabase_contabilidad.sql).
+// ============================================================
+const CONTA_TABLA_OPS = 'operaciones';
+const CONTA_TABLA_EGR = 'egresos';
+const contaEstado = { ops: [], egr: [], periodo: 'semana', hist: 'dia', ultimo: null };
+const CONTA_LABEL_TIPO = { Accesorio: 'Accesorios', Celular: 'Celulares', Reparacion: 'Reparaciones' };
+
+function contaFmt(n) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(n) || 0); }
+function contaEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function contaEsElectronico(m) { return /transfer|tarjeta|electr|nequi|daviplata|pse|dat[aá]fono/i.test(String(m || '')); }
+function contaHoyISO() { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`; }
+function contaInicioDia(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function contaInicioSemana(d) { const x = contaInicioDia(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function contaInicioMes(d) { const x = contaInicioDia(d); x.setDate(1); return x; }
+
+function contaRangoPeriodo(p) {
+    const ahora = new Date();
+    const hasta = new Date(ahora.getTime() + 1000);
+    let desde = null;
+    if (p === 'hoy') desde = contaInicioDia(ahora);
+    else if (p === 'semana') desde = contaInicioSemana(ahora);
+    else if (p === 'mes') desde = contaInicioMes(ahora);
+    return { desde, hasta };
+}
+
+function contaEnIntervalo(fecha, desde, hasta) {
+    const x = new Date(fecha).getTime();
+    if (isNaN(x)) return false;
+    if (desde && x < desde.getTime()) return false;
+    return x < hasta.getTime();
+}
+
+function contaCalcular(ops, egr) {
+    const t = { ingresos: 0, egresos: 0, electronicos: 0, efectivo: 0, pendiente: 0, nOps: 0, nEgr: 0, egrElec: 0, tipos: {} };
+    ops.forEach(o => {
+        const pagado = Number(o.amount_paid) || 0;
+        const total = Number(o.total) || 0;
+        t.ingresos += pagado;
+        t.nOps++;
+        if (contaEsElectronico(o.payment_method)) t.electronicos += pagado; else t.efectivo += pagado;
+        const pend = total - pagado;
+        if (pend > 0) t.pendiente += pend;
+        const tipo = o.tipo_operacion || 'Otro';
+        t.tipos[tipo] = (t.tipos[tipo] || 0) + pagado;
+    });
+    egr.forEach(e => {
+        const m = Number(e.monto) || 0;
+        t.egresos += m;
+        t.nEgr++;
+        if (contaEsElectronico(e.metodo_pago)) t.egrElec += m;
+    });
+    t.balance = t.ingresos - t.egresos;
+    return t;
+}
+
+function contaTextoPeriodo(p, r) {
+    const f = d => d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+    if (p === 'hoy') return 'Hoy · ' + f(new Date());
+    if (p === 'semana') return 'Semana del ' + f(r.desde) + ' al ' + f(new Date());
+    if (p === 'mes') return 'Mes de ' + new Date().toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+    return 'Histórico completo';
+}
+
+// Histórico: 'dia' = últimos 14 días, 'semana' = últimas 8 semanas (desde lunes)
+function contaHistorico(tipo) {
+    const ahora = new Date();
+    const filas = [];
+    if (tipo === 'dia') {
+        for (let i = 13; i >= 0; i--) {
+            const desde = contaInicioDia(ahora);
+            desde.setDate(desde.getDate() - i);
+            const hasta = new Date(desde);
+            hasta.setDate(hasta.getDate() + 1);
+            filas.push({ etiqueta: desde.toLocaleDateString('es-CO', { weekday: 'short', day: '2-digit', month: 'short' }), desde, hasta });
+        }
+    } else {
+        const base = contaInicioSemana(ahora);
+        for (let i = 7; i >= 0; i--) {
+            const desde = new Date(base);
+            desde.setDate(desde.getDate() - 7 * i);
+            const hasta = new Date(desde);
+            hasta.setDate(hasta.getDate() + 7);
+            const fin = new Date(hasta);
+            fin.setDate(fin.getDate() - 1);
+            filas.push({ etiqueta: desde.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) + ' – ' + fin.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }), desde, hasta });
+        }
+    }
+    return filas.map(f => {
+        const ops = contaEstado.ops.filter(o => contaEnIntervalo(o.created_at, f.desde, f.hasta));
+        const egr = contaEstado.egr.filter(e => contaEnIntervalo(e.fecha, f.desde, f.hasta));
+        const t = contaCalcular(ops, egr);
+        return { etiqueta: f.etiqueta, ingresos: t.ingresos, egresos: t.egresos, electronicos: t.electronicos, balance: t.balance };
+    });
+}
+
+function contaRenderHistorico() {
+    const filas = contaHistorico(contaEstado.hist);
+    const max = Math.max(1, ...filas.map(f => Math.max(f.ingresos, f.egresos)));
+    document.getElementById('contaBars').innerHTML = filas.map(f => {
+        const hi = f.ingresos > 0 ? Math.max(2, Math.round(f.ingresos / max * 150)) : 0;
+        const he = f.egresos > 0 ? Math.max(2, Math.round(f.egresos / max * 150)) : 0;
+        return `<div class="conta-bar-col" title="${contaEsc(f.etiqueta)}: balance ${contaFmt(f.balance)}"><div class="conta-bar-pair"><div class="conta-bar ok" style="height:${hi}px"></div><div class="conta-bar bad" style="height:${he}px"></div></div><small>${contaEsc(f.etiqueta)}</small></div>`;
+    }).join('');
+    document.getElementById('contaHistBody').innerHTML = filas.map(f => `<tr><td>${contaEsc(f.etiqueta)}</td><td>${contaFmt(f.ingresos)}</td><td>${contaFmt(f.egresos)}</td><td>${contaFmt(f.electronicos)}</td><td style="color:${f.balance < 0 ? '#ff5e5e' : '#12d8c4'};font-weight:600">${contaFmt(f.balance)}</td></tr>`).join('');
+    document.querySelectorAll('#contaHistSeg button').forEach(b => b.classList.toggle('on', b.dataset.hist === contaEstado.hist));
+}
+
+function contaRender() {
+    const r = contaRangoPeriodo(contaEstado.periodo);
+    const ops = contaEstado.ops.filter(o => contaEnIntervalo(o.created_at, r.desde, r.hasta));
+    const egr = contaEstado.egr.filter(e => contaEnIntervalo(e.fecha, r.desde, r.hasta));
+    const t = contaCalcular(ops, egr);
+    contaEstado.ultimo = { t, ops, egr, r };
+
+    document.querySelectorAll('#contaPeriodoSeg button').forEach(b => b.classList.toggle('on', b.dataset.periodo === contaEstado.periodo));
+    document.getElementById('contaPeriodoLabel').innerText = contaTextoPeriodo(contaEstado.periodo, r);
+    document.getElementById('kpi_ingresos').innerText = contaFmt(t.ingresos);
+    document.getElementById('kpi_ingresos_n').innerText = t.nOps + ' operaciones';
+    document.getElementById('kpi_egresos').innerText = contaFmt(t.egresos);
+    document.getElementById('kpi_egresos_n').innerText = t.nEgr + ' registros';
+    const bal = document.getElementById('kpi_balance');
+    bal.innerText = contaFmt(t.balance);
+    bal.className = t.balance < 0 ? 'c-bad' : 'c-ok';
+    document.getElementById('kpi_electronicos').innerText = contaFmt(t.electronicos);
+    document.getElementById('kpi_efectivo').innerText = contaFmt(t.efectivo);
+    document.getElementById('kpi_pendiente').innerText = contaFmt(t.pendiente);
+
+    const base = ['Accesorio', 'Celular', 'Reparacion'];
+    const extra = Object.keys(t.tipos).filter(k => !base.includes(k));
+    document.getElementById('conta_tipos').innerHTML = base.concat(extra).map(k =>
+        `<div class="conta-tipo"><span>${contaEsc(CONTA_LABEL_TIPO[k] || k)}</span><strong>${contaFmt(t.tipos[k] || 0)}</strong></div>`
+    ).join('');
+    contaRenderHistorico();
+}
+
+function contaSetPeriodo(p) { contaEstado.periodo = p; contaRender(); }
+function contaSetHist(h) { contaEstado.hist = h; contaRenderHistorico(); }
+
+async function contaCargar() {
+    try {
+        const sb = window.jkSupabase;
+        const [rOps, rEgr] = await Promise.all([
+            sb.from(CONTA_TABLA_OPS).select('id, tipo_operacion, numero_factura, customer_name, total, amount_paid, payment_method, payment_type, created_at, asesor').order('created_at', { ascending: false }).limit(5000),
+            sb.from(CONTA_TABLA_EGR).select('*').order('fecha', { ascending: false }).limit(5000)
+        ]);
+        if (rOps.error) throw rOps.error;
+        contaEstado.ops = rOps.data || [];
+        if (rEgr.error) {
+            console.warn('Tabla egresos no disponible:', rEgr.error);
+            contaEstado.egr = [];
+            mostrarAlertaError('Tabla egresos no disponible. Ejecuta el archivo supabase_contabilidad.sql en Supabase.');
+        } else {
+            contaEstado.egr = rEgr.data || [];
+        }
+        contaRender();
+    } catch (e) {
+        console.error(e);
+        mostrarAlertaError('No se pudo cargar la contabilidad: ' + e.message);
+    }
+}
+
+function abrirContabilidad() {
+    if (!obtenerSesion()) {
+        mostrarAlertaError('Debes iniciar sesión para ver la contabilidad.');
+        abrirModalSesion();
+        return;
+    }
+    document.getElementById('eg_fecha').value = contaHoyISO();
+    abrirModalFormulario('modal_contabilidad');
+    contaCargar();
+}
+
+async function contaGuardarEgreso() {
+    if (!obtenerSesion()) { mostrarAlertaError('Debes iniciar sesión para registrar egresos.'); return; }
+    const concepto = document.getElementById('eg_concepto').value.trim();
+    const monto = parseFloat(document.getElementById('eg_monto').value);
+    if (!concepto || !(monto > 0)) { mostrarAlertaError('Escribe el concepto y un monto válido.'); return; }
+    const fechaVal = document.getElementById('eg_fecha').value;
+    const sesion = obtenerSesion() || {};
+    const data = {
+        concepto: concepto,
+        categoria: document.getElementById('eg_categoria').value,
+        monto: monto,
+        metodo_pago: document.getElementById('eg_metodo').value,
+        fecha: fechaVal ? new Date(fechaVal + 'T12:00:00').toISOString() : new Date().toISOString(),
+        notas: document.getElementById('eg_notas').value.trim() || null,
+        asesor: sesion.nombre || 'N/A'
+    };
+    const btn = document.getElementById('btnEgreso');
+    btn.disabled = true;
+    btn.innerText = 'Guardando...';
+    try {
+        const { error } = await window.jkSupabase.from(CONTA_TABLA_EGR).insert([data]);
+        if (error) throw error;
+        mostrarAlertaExito('Egreso registrado correctamente.');
+        document.getElementById('form_egreso').reset();
+        document.getElementById('eg_fecha').value = contaHoyISO();
+        await contaCargar();
+    } catch (e) {
+        console.error(e);
+        mostrarAlertaError('Error al guardar el egreso: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Registrar egreso';
+    }
+}
+
+function contaGenerarPDF() {
+    if (!contaEstado.ultimo) { mostrarAlertaError('Primero carga la contabilidad.'); return; }
+    const { t, ops, egr, r } = contaEstado.ultimo;
+    const ahora = new Date();
+    const fmtFecha = d => d ? new Date(d).toLocaleDateString('es-CO') : '—';
+    const sesion = obtenerSesion() || {};
+    const hist = contaHistorico('dia');
+
+    const filasTipos = Object.keys(t.tipos).map(k =>
+        `<tr><td>${contaEsc(CONTA_LABEL_TIPO[k] || k)}</td><td class="num">${contaFmt(t.tipos[k])}</td></tr>`
+    ).join('') || '<tr><td colspan="2" class="vacio">Sin ingresos en el periodo</td></tr>';
+
+    const filasHist = hist.map(h =>
+        `<tr><td>${contaEsc(h.etiqueta)}</td><td class="num">${contaFmt(h.ingresos)}</td><td class="num">${contaFmt(h.egresos)}</td><td class="num">${contaFmt(h.electronicos)}</td><td class="num">${contaFmt(h.balance)}</td></tr>`
+    ).join('');
+
+    const filasOps = ops.slice(0, 100).map(o =>
+        `<tr><td>${fmtFecha(o.created_at)}</td><td>${contaEsc(o.numero_factura || '—')}</td><td>${contaEsc(o.tipo_operacion)}</td><td>${contaEsc(o.customer_name)}</td><td>${contaEsc(o.payment_method)}</td><td class="num">${contaFmt(o.total)}</td><td class="num">${contaFmt(o.amount_paid)}</td></tr>`
+    ).join('') || '<tr><td colspan="7" class="vacio">Sin operaciones en el periodo</td></tr>';
+
+    const filasEgr = egr.slice(0, 100).map(e =>
+        `<tr><td>${fmtFecha(e.fecha)}</td><td>${contaEsc(e.concepto)}</td><td>${contaEsc(e.categoria || '—')}</td><td>${contaEsc(e.metodo_pago || '—')}</td><td class="num">${contaFmt(e.monto)}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="vacio">Sin egresos en el periodo</td></tr>';
+
+    const html = `
+        <div class="conta-pdf-head">
+            <div class="conta-pdf-logo">JK</div>
+            <div>
+                <h1>ACCESORIOS JK</h1>
+                <p>Reporte Contable · Sistema JK ERP</p>
+                <p>NIT: 1005715210 · Régimen simplificado</p>
+                <p>Calle 14 # 2-67 Centro Ibagué - Tolima</p>
+            </div>
+            <div class="conta-pdf-meta">
+                <p><strong>Periodo:</strong> ${contaEsc(contaTextoPeriodo(contaEstado.periodo, r))}</p>
+                <p><strong>Generado:</strong> ${contaEsc(ahora.toLocaleString('es-CO'))}</p>
+                <p><strong>Elaborado por:</strong> ${contaEsc(sesion.nombre || 'N/A')}</p>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>1. Resumen de indicadores</h2>
+            <div class="kpi-grid">
+                <div class="kpi-box"><span>Ingresos totales</span><strong>${contaFmt(t.ingresos)}</strong></div>
+                <div class="kpi-box"><span>Egresos totales</span><strong>${contaFmt(t.egresos)}</strong></div>
+                <div class="kpi-box"><span>Balance neto</span><strong>${contaFmt(t.balance)}</strong></div>
+                <div class="kpi-box"><span>Pagos electrónicos (transf. / tarjeta)</span><strong>${contaFmt(t.electronicos)}</strong></div>
+                <div class="kpi-box"><span>Efectivo recibido</span><strong>${contaFmt(t.efectivo)}</strong></div>
+                <div class="kpi-box"><span>Saldo por cobrar</span><strong>${contaFmt(t.pendiente)}</strong></div>
+            </div>
+        </div>
+
+        <div class="sec">
+            <h2>2. Estado de cuentas</h2>
+            <table>
+                <thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead>
+                <tbody>
+                    <tr><td>Ingresos (abonos y pagos recibidos)</td><td class="num">${contaFmt(t.ingresos)}</td></tr>
+                    <tr><td>(-) Egresos registrados</td><td class="num">${contaFmt(t.egresos)}</td></tr>
+                    <tr class="neto"><td>Balance neto del periodo</td><td class="num">${contaFmt(t.balance)}</td></tr>
+                    <tr><td>Egresos pagados electrónicamente</td><td class="num">${contaFmt(t.egrElec)}</td></tr>
+                    <tr><td>Número de operaciones</td><td class="num">${t.nOps}</td></tr>
+                    <tr><td>Número de egresos</td><td class="num">${t.nEgr}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sec">
+            <h2>3. Ingresos por tipo de operación</h2>
+            <table>
+                <thead><tr><th>Tipo</th><th class="num">Ingresos</th></tr></thead>
+                <tbody>${filasTipos}</tbody>
+            </table>
+        </div>
+
+        <div class="sec">
+            <h2>4. Histórico del balance (últimos 14 días)</h2>
+            <table>
+                <thead><tr><th>Día</th><th class="num">Ingresos</th><th class="num">Egresos</th><th class="num">Electrónicos</th><th class="num">Balance</th></tr></thead>
+                <tbody>${filasHist}</tbody>
+            </table>
+        </div>
+
+        <div class="sec">
+            <h2>5. Detalle de operaciones (${Math.min(ops.length, 100)} de ${ops.length})</h2>
+            <table>
+                <thead><tr><th>Fecha</th><th>Factura</th><th>Tipo</th><th>Cliente</th><th>Pago</th><th class="num">Total</th><th class="num">Pagado</th></tr></thead>
+                <tbody>${filasOps}</tbody>
+            </table>
+        </div>
+
+        <div class="sec">
+            <h2>6. Detalle de egresos (${Math.min(egr.length, 100)} de ${egr.length})</h2>
+            <table>
+                <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Método</th><th class="num">Monto</th></tr></thead>
+                <tbody>${filasEgr}</tbody>
+            </table>
+        </div>
+
+        <div class="firmas">
+            <div class="firma">Elaborado por<br>${contaEsc(sesion.nombre || '')}</div>
+            <div class="firma">Revisado / Gerencia<br>ACCESORIOS JK</div>
+        </div>
+        <div class="pie">Documento generado automáticamente por Sistema JK · ${contaEsc(ahora.toLocaleString('es-CO'))}</div>
+    `;
+
+    const cont = document.createElement('div');
+    cont.className = 'conta-pdf';
+    cont.innerHTML = html;
+    document.body.appendChild(cont);
+
+    html2pdf().set({
+        margin: [0.3, 0.3, 0.3, 0.3],
+        filename: `Reporte_Contable_JK_${contaHoyISO()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+    }).from(cont).save().then(() => {
+        cont.remove();
+        appCore.mostrarAvisoPDF();
+    }).catch(e => {
+        cont.remove();
+        console.error(e);
+        mostrarAlertaError('No se pudo generar el reporte PDF.');
+    });
 }
 </script>
 </body>
