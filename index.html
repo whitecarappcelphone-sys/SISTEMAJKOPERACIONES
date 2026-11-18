@@ -357,6 +357,20 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     .conta-bar-col small { display: block; width: 100%; text-align: right; transform-origin: top right; transform: rotate(-40deg); margin-top: 6px; }
 }
 
+/* ============ NUEVO: QR EN TALLER Y ETIQUETA INDEPENDIENTE ============ */
+.tqr-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.tqr-card { background: #171a21; border: 1px solid rgba(18,216,196,.15); border-radius: 14px; padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; transition: .25s; min-width: 0; }
+.tqr-card:hover { border-color: #12d8c4; transform: translateY(-2px); }
+.tqr-img { width: 84px; height: 84px; flex-shrink: 0; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.tqr-img img { width: 100%; height: 100%; display: block; }
+.tqr-img i { color: #999; font-size: 26px; }
+.tqr-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; align-items: flex-start; }
+.tqr-info strong { font-size: 12px; color: #fff; }
+.tqr-info span { font-size: 11px; color: #bfc6d2; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tqr-info small { font-size: 10px; color: #7d8594; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 900px) { .tqr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .tqr-grid { grid-template-columns: 1fr; } }
+
 /* PDF CONTABLE (se genera fuera de pantalla) */
 .conta-pdf { position: absolute; left: -10000px; top: 0; width: 750px; background: #ffffff; color: #111111; font-family: Arial, sans-serif; font-size: 12px; padding: 24px; }
 .conta-pdf-head { display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #12d8c4; padding-bottom: 14px; margin-bottom: 6px; }
@@ -595,6 +609,12 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
 <div class="panel-sec">
     <div class="panel-titulo"><i class="fa-solid fa-screwdriver-wrench"></i> Taller · Estado de reparaciones</div>
     <div class="pk-row" id="panelTaller"></div>
+</div>
+
+<!-- NUEVO: REPARACIONES REGISTRADAS CON QR (se actualiza al registrar una reparación) -->
+<div class="panel-sec">
+    <div class="panel-titulo"><i class="fa-solid fa-qrcode"></i> Reparaciones registradas · Código QR</div>
+    <div class="tqr-grid" id="tallerQR"></div>
 </div>
 
 <!-- NUEVO: KPIs INVENTARIO -->
@@ -3085,13 +3105,13 @@ function repQRTexto(d) {
         d.id ? 'ID: ' + d.id : ''
     ].filter(Boolean).join('\n').slice(0, 900);
 }
-function repQRDataURL(text) {
+function repQRDataURL_old(text) {
     const tmp = document.createElement('div');
     new QRCode(tmp, { text: text, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
     const c = tmp.querySelector('canvas');
     return c ? c.toDataURL('image/png') : '';
 }
-function repImprimirEtiqueta(d) {
+function repImprimirEtiqueta_old(d) {
     let qr = '';
     try { qr = repQRDataURL(repQRTexto(d)); } catch (e) { console.error(e); mostrarAlertaError('No se pudo generar el código QR.'); return; }
     const w = window.open('', '_blank', 'width=520,height=460');
@@ -3867,6 +3887,95 @@ function contaReportePDFv2() {
 
 // ---------- INICIO ----------
 cfgCargar();
+</script>
+<script>
+/* =====================================================================
+   NUEVO: QR INDEPENDIENTE, ETIQUETA TERMICA Y QR EN TALLER
+   ===================================================================== */
+// Genera el QR con la librería local; si falla, usa un servicio de QR en línea (sin clave)
+function repQRSrc(text) {
+    try {
+        const tmp = document.createElement('div');
+        new QRCode(tmp, { text: text, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+        const c = tmp.querySelector('canvas');
+        if (c) {
+            const url = c.toDataURL('image/png');
+            if (url && url.length > 100) return url;
+        }
+    } catch (e) {
+        console.warn('QR local no disponible; se usa el servicio en línea.', e);
+    }
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&ecc=M&data=' + encodeURIComponent(text);
+}
+function repQRDataURL(text) { return repQRSrc(text); }
+
+// Etiqueta térmica (80 x 50 mm). Se imprime aunque el QR no esté disponible.
+function repImprimirEtiqueta(d) {
+    let qr = '';
+    try { qr = repQRSrc(repQRTexto(d)); } catch (e) { console.warn('QR no generado; la etiqueta se imprime sin QR.', e); }
+    const w = window.open('', '_blank', 'width=520,height=460');
+    if (!w) { mostrarAlertaError('Permite las ventanas emergentes para imprimir la etiqueta.'); return; }
+    const recorta = (s, n) => { const t = String(s || '—'); return t.length > n ? t.slice(0, n) + '…' : t; };
+    const ck = d.checklist || {};
+    const nov = REP_CHECK.filter(([k]) => ck[k] === 'no').map(([, l]) => l);
+    const imgQR = qr ? `<img src="${qr}" alt="QR" onerror="this.style.display='none'">` : '';
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Etiqueta ${contaEsc(d.numero || '')}</title>
+<style>
+@page { size: 80mm 50mm; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
+.et { width: 80mm; height: 50mm; padding: 2mm 2.5mm; display: flex; gap: 2mm; overflow: hidden; }
+.info { flex: 1; font-size: 6.8pt; line-height: 1.25; overflow: hidden; }
+.info h2 { margin: 0 0 1mm; font-size: 7.5pt; }
+.info p { margin: 0 0 0.6mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.num { font-size: 8.5pt !important; font-weight: bold; }
+.qr { width: 22mm; text-align: center; font-size: 5.5pt; flex-shrink: 0; }
+.qr img { width: 21mm; height: 21mm; display: block; margin: 0 auto 0.5mm; }
+</style></head>
+<body onload="setTimeout(function(){ window.print(); }, 400)">
+<div class="et">
+    <div class="info">
+        <h2>${contaEsc(JK_CFG.empresa)} · INGRESO DE EQUIPO</h2>
+        <p class="num">${contaEsc(d.numero || 'Pendiente')}</p>
+        <p><b>Cliente:</b> ${contaEsc(recorta(d.cliente, 26))} · ${contaEsc(d.telefono || '—')}</p>
+        <p><b>Equipo:</b> ${contaEsc(recorta(d.equipo, 30))}</p>
+        <p><b>IMEI:</b> ${contaEsc(d.imei1 || '—')}</p>
+        <p><b>Falla:</b> ${contaEsc(recorta(d.falla, 40))}</p>
+        <p><b>Ingreso:</b> ${contaEsc(pnlFecha(d.fecha))}</p>
+        <p><b>Garantía:</b> ${d.dias > 0 ? d.dias + ' días' : 'N/A'} · <b>Estado:</b> ${contaEsc(repEtiquetaEstado(d.estadoRaw))}</p>
+        <p><b>Novedades:</b> ${contaEsc(recorta(nov.join(', ') || 'Ninguna', 42))}</p>
+    </div>
+    <div class="qr">${imgQR}<div>Escanee para<br>ver los datos</div></div>
+</div>
+</body></html>`);
+    w.document.close();
+}
+
+// Taller: muestra el QR de las reparaciones registradas (se actualiza al guardar)
+function tallerQRRender() {
+    const cont = document.getElementById('tallerQR');
+    if (!cont) return;
+    const lista = PANEL.ops.filter(pnlEsRep).slice(0, 8);
+    if (!lista.length) { cont.innerHTML = '<div class="vacio-box">Aún no hay reparaciones registradas.</div>'; return; }
+    cont.innerHTML = lista.map(o => {
+        let src = '';
+        try { src = repQRSrc(repQRTexto(repDatosDesdeOp(o))); } catch (e) { console.warn(e); }
+        const id = String(o.id).replace(/'/g, '');
+        return `<div class="tqr-card" onclick="abrirDetalleOperacion('${id}')">
+            <div class="tqr-img">${src ? `<img src="${src}" alt="QR">` : '<i class="fa-solid fa-qrcode"></i>'}</div>
+            <div class="tqr-info">
+                <strong>${contaEsc(o.numero_factura || '—')}</strong>
+                <span>${contaEsc(o.customer_name || '—')}</span>
+                <small>${contaEsc(o.equipo || o.descripcion || '—')}</small>
+                ${pnlChip(pnlEstadoTaller(o))}
+            </div>
+        </div>`;
+    }).join('');
+}
+(function () {
+    const _panelRenderTodoOriginal = panelRenderTodo;
+    panelRenderTodo = function () { _panelRenderTodoOriginal(); tallerQRRender(); };
+})();
 </script>
 </body>
 </html>
