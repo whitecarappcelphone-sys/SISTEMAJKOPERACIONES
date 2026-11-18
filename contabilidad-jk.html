@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema JK - Contabilidad Diaria</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --jk-bg:#0a1517;
+  --jk-card:#171e28;
+  --jk-card2:#1e2632;
+  --jk-accent:#00e0c0;
+  --jk-accent-dim:rgba(0,224,192,.15);
+  --jk-text:#ffffff;
+  --jk-muted:#8b95a5;
+  --jk-border:rgba(255,255,255,.08);
+  --jk-red:#ff6b6b;
+  --jk-yellow:#ffcc5c;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+body{background:var(--jk-bg);color:var(--jk-text);margin:0;padding:0 14px 60px}
+.header{display:flex;justify-content:space-between;align-items:center;padding:18px 4px}
+.logo-dot{width:54px;height:54px;background:var(--jk-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;box-shadow:0 0 20px rgba(0,224,192,.5)}
+.h-title{font-size:22px;font-weight:800;margin:6px 0 2px}
+.h-sub{color:var(--jk-muted);font-size:13px}
+.btn-sesion{border:1px solid var(--jk-accent);color:var(--jk-accent);background:var(--jk-accent-dim);padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700}
+.card{background:var(--jk-card);border:1px solid var(--jk-border);border-radius:18px;padding:16px;margin:12px 0}
+.card-title{font-size:12px;letter-spacing:2px;color:var(--jk-muted);font-weight:800;margin-bottom:12px}
+.today{font-size:20px;font-weight:800}
+.vivo{color:var(--jk-accent);font-size:12px;font-weight:800;letter-spacing:1px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0}
+.btn-adjust{background:#fff;color:#000;border:0;border-radius:10px;padding:10px;font-weight:800;font-size:13px;cursor:pointer}
+.btn-adjust.nequi{background:#ece9ff;color:#7a73ff}
+.btn-adjust.ahorro{background:#fff6d9;color:#d69a00}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.balance{background:var(--jk-card2);border-radius:14px;padding:12px;border:1px solid var(--jk-border)}
+.balance b{font-size:11px;color:var(--jk-muted)}
+.balance .val{font-size:20px;font-weight:900;margin:4px 0}
+.balance small{color:var(--jk-muted);font-size:11px}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.act{background:var(--jk-card2);border-radius:16px;padding:16px 10px;text-align:center;cursor:pointer;border:1px solid var(--jk-border)}
+.act h4{margin:8px 0 4px;font-size:14px}
+.act p{margin:0;color:var(--jk-muted);font-size:11px}
+.icon{width:42px;height:42px;background:var(--jk-accent-dim);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th{text-align:left;color:var(--jk-muted);font-size:11px;padding:8px;border-bottom:1px solid var(--jk-border)}
+td{padding:10px 8px;border-bottom:1px solid var(--jk-border)}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.INGRESO{background:rgba(0,224,192,.2);color:var(--jk-accent)}
+.EGRESO{background:rgba(255,107,107,.2);color:var(--jk-red)}
+select,input{width:100%;background:#0f181b;border:1px solid var(--jk-border);color:#fff;padding:10px;border-radius:10px;margin:4px 0}
+button.main{background:var(--jk-accent);border:0;color:#000;font-weight:900;padding:12px;border-radius:12px;width:100%;cursor:pointer;margin-top:8px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:var(--jk-card);border-radius:18px;padding:20px;width:100%;max-width:420px;border:1px solid var(--jk-border)}
+.tabs{display:flex;gap:8px;overflow:auto;margin:10px 0}
+.tab{background:var(--jk-card2);border:1px solid var(--jk-border);color:#fff;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
+.tab.active{background:var(--jk-accent);color:#000}
+a.back{color:var(--jk-accent);text-decoration:none;font-size:13px;font-weight:700}
+.footer{text-align:center;color:var(--jk-muted);font-size:11px;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div><div class="logo-dot">JK</div><div class="h-title">Sistema JK</div><div class="h-sub">ERP Empresarial</div></div>
+  <div style="text-align:right"><div style="font-size:13px;font-weight:800">Usuario</div><div style="font-size:12px;color:var(--jk-muted)">Vendedor <span class="btn-sesion">Iniciar Sesión</span></div><div style="margin-top:8px"><a class="back" href="./index.html">← Volver a Registrar operación</a></div></div>
+</div>
+<div class="card">
+  <div class="card-title">▸ CONTABILIDAD DIARIA</div>
+  <div class="today">Hoy</div>
+  <div id="fechaHoy" style="color:var(--jk-muted);font-size:13px"></div>
+  <div class="vivo">EN VIVO • <span id="pendientes">0 pendientes</span></div>
+  <div class="row3">
+    <button class="btn-adjust" onclick="abrirModal('m-caja')">Ajustar<br>Caja</button>
+    <button class="btn-adjust nequi" onclick="abrirModal('m-nequi')">Ajustar<br>Nequi</button>
+    <button class="btn-adjust ahorro" onclick="abrirModal('m-ahorro')">Ajustar<br>Ahorro</button>
+  </div>
+  <div class="grid2">
+    <div class="balance"><b>BALANCE CAJA</b><div class="val" id="bCaja">$0</div><small id="bCajaIni">inicial $0</small></div>
+    <div class="balance"><b>BALANCE NEQUI</b><div class="val" id="bNequi" style="color:#9d97ff">$0</div><small id="bNequiIni">inicial $0</small></div>
+    <div class="balance"><b>INGRESOS</b><div class="val" id="bIng">$0</div><small id="bIngN">0 ingresos</small></div>
+    <div class="balance"><b>EGRESOS</b><div class="val" id="bEgr">$0</div><small id="bEgrN">0 egresos</small></div>
+    <div class="balance"><b>AHORRO</b><div class="val" id="bAho" style="color:var(--jk-yellow)">$0</div><small>sin ahorro hoy</small></div>
+    <div class="balance"><b>ELECTRONICOS</b><div class="val" id="bEle" style="color:#9d97ff">$0</div><small>Otros métodos</small></div>
+  </div>
+  <div style="margin-top:10px;color:var(--jk-muted);font-size:12px">MOVIMIENTOS <b id="bMov" style="color:#fff">0</b> movimientos hoy</div>
+</div>
+<div class="card">
+  <div class="card-title">⚡ ACCIONES RÁPIDAS</div>
+  <div class="actions">
+    <div class="act" onclick="abrirModal('m-venta')"><div class="icon">⚡</div><h4>Nueva venta rápida</h4><p>Cobro inmediato sin orden</p></div>
+    <div class="act" onclick="abrirModal('m-orden')"><div class="icon">🧾</div><h4>Nueva orden</h4><p>Reparación con seguimiento</p></div>
+    <div class="act" onclick="abrirModal('m-salida')"><div class="icon">💸</div><h4>Nueva salida</h4><p>Gasto, compra a proveedor</p></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">TÉCNICOS · SEMANA EN CURSO</div>
+  <b style="font-size:12px">LOCALES · TALLER</b>
+  <div id="tecLocales" style="margin:8px 0"></div>
+  <button class="main" style="background:#fff" onclick="abrirModal('m-tec')">+ Añadir técnico</button>
+  <div style="margin-top:12px"><b style="font-size:12px">TÉCNICOS EXTERNOS</b><div id="tecExternos" style="margin:8px 0"></div></div>
+</div>
+<div class="card">
+  <div class="card-title">REPORTES CONTABLES · ANÁLISIS</div>
+  <div class="tabs">
+    <div class="tab active" onclick="filtrarRep('DIA',this)">Día</div>
+    <div class="tab" onclick="filtrarRep('SEMANA',this)">Semana</div>
+    <div class="tab" onclick="filtrarRep('QUINCENA',this)">Quincena</div>
+    <div class="tab" onclick="filtrarRep('MES',this)">Mes</div>
+    <div class="tab" onclick="filtrarRep('DIAN',this)">DIAN renta (año actual)</div>
+  </div>
+  <div id="repBox" style="background:#0f181b;border-radius:12px;padding:12px;font-size:13px">Selecciona un período para ver el balance agrupado.</div>
+  <div style="margin-top:12px"><b>HISTÓRICO · BALANCE DE LA SEMANA</b><div id="semLabel" style="font-size:12px;color:var(--jk-muted);margin:6px 0"></div><div id="semBox"></div></div>
+</div>
+<div class="card">
+  <div class="card-title">MOVIMIENTOS · HISTORIAL COMPLETO</div>
+  <input id="fBuscar" placeholder="Buscar..." oninput="cargarMovimientos()">
+  <select id="fTipo" onchange="cargarMovimientos()"><option value="">Todos los tipos</option><option>INGRESO</option><option>EGRESO</option><option>AHORRO</option></select>
+  <select id="fMetodo" onchange="cargarMovimientos()"><option value="">Todos los métodos</option><option>EFECTIVO</option><option>NEQUI</option><option>AHORRO</option><option>ELECTRONICO</option></select>
+  <div style="overflow:auto"><table><thead><tr><th>FECHA</th><th>DESCRIPCIÓN</th><th>TIPO</th><th>VALOR</th></tr></thead><tbody id="tbMov"></tbody></table></div>
+</div>
+<div class="footer" id="footUpd">Actualizado · Se actualiza cada 60 s</div>
+<div class="modal" id="m-venta"><div class="modal-box"><h3>Nueva venta rápida</h3><input id="vDesc" placeholder="Descripción Ej: Forro iPhone"><input id="vVal" type="number" placeholder="Valor"><select id="vMet"><option>EFECTIVO</option><option>NEQUI</option><option>ELECTRONICO</option></select><button class="main" onclick="guardarVenta()">Guardar ingreso</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-salida"><div class="modal-box"><h3>Nueva salida</h3><input id="sDesc" placeholder="Gasto / Compra proveedor"><input id="sVal" type="number" placeholder="Valor"><select id="sMet"><option>EFECTIVO</option><option>NEQUI</option><option>ELECTRONICO</option></select><button class="main" style="background:var(--jk-red);color:#fff" onclick="guardarSalida()">Guardar egreso</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-orden"><div class="modal-box"><h3>Nueva orden</h3><input id="oCli" placeholder="Cliente"><input id="oEq" placeholder="Equipo Ej: iPhone 15 pro max"><input id="oAbo" type="number" placeholder="Abono inicial"><input id="oTot" type="number" placeholder="Total reparación"><select id="oTec"></select><button class="main" onclick="guardarOrden()">Crear orden # + abono</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-tec"><div class="modal-box"><h3>Añadir técnico</h3><input id="tNom" placeholder="Nombre"><select id="tTipo"><option>LOCAL</option><option>EXTERNO</option></select><button class="main" onclick="guardarTecnico()">Guardar</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-caja"><div class="modal-box"><h3>Ajustar Caja inicial hoy</h3><input id="cCaja" type="number" placeholder="Valor inicial"><button class="main" onclick="ajustarCaja('caja_inicial',document.getElementById('cCaja').value)">Guardar</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-nequi"><div class="modal-box"><h3>Ajustar Nequi inicial hoy</h3><input id="cNequi" type="number" placeholder="Valor inicial"><button class="main" onclick="ajustarCaja('nequi_inicial',document.getElementById('cNequi').value)">Guardar</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<div class="modal" id="m-ahorro"><div class="modal-box"><h3>Ajustar Ahorro inicial hoy</h3><input id="cAho" type="number" placeholder="Valor inicial"><button class="main" onclick="ajustarCaja('ahorro_inicial',document.getElementById('cAho').value)">Guardar</button><button class="main" style="background:#333;color:#fff" onclick="cerrarModales()">Cerrar</button></div></div>
+<script>
+// ====== CREDENCIALES REALES SISTEMA JK - YA CORREGIDAS ======
+const SUPABASE_URL = "https://scippqgodwvbopslwxdf.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sakCK5FcUzB3ZmfwNKt4cw_AJi2Nw95";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ================================================================
+const fmt = n => "$" + Number(n||0).toLocaleString('es-CO');
+const hoyISO = () => new Date().toISOString().slice(0,10);
+document.getElementById('fechaHoy').textContent = "— " + new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function abrirModal(id){cerrarModales();document.getElementById(id).classList.add('open'); if(id==='m-orden') cargarTecSelect();}
+function cerrarModales(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))}
+async function init(){
+  await cargarCajas(); await cargarMovimientos(); await cargarTecnicos(); await cargarPendientes(); actualizarHora();
+}
+function actualizarHora(){document.getElementById('footUpd').textContent = "Actualizado "+new Date().toLocaleString('es-CO')+" · Se actualiza cada 60 s";}
+async function cargarCajas(){
+  let {data} = await sb.from('jk_cajas').select('*').eq('fecha',hoyISO()).maybeSingle();
+  if(!data){ await sb.from('jk_cajas').insert({fecha:hoyISO()}); data={caja_inicial:0,nequi_inicial:0,ahorro_inicial:0}; }
+  document.getElementById('bCajaIni').textContent="inicial "+fmt(data.caja_inicial);
+  document.getElementById('bNequiIni').textContent="inicial "+fmt(data.nequi_inicial);
+  window._ini=data;
+}
+async function cargarMovimientos(){
+  const {data} = await sb.from('jk_movimientos').select('*,jk_tecnicos(nombre)').order('created_at',{ascending:false}).limit(200);
+  window._movs=data||[];
+  const q=(document.getElementById('fBuscar').value||'').toLowerCase();
+  const t=document.getElementById('fTipo').value, m=document.getElementById('fMetodo').value;
+  let hoyMovs=(data||[]).filter(x=>x.fecha===hoyISO());
+  let ing=hoyMovs.filter(x=>x.tipo==='INGRESO'), egr=hoyMovs.filter(x=>x.tipo==='EGRESO');
+  let sum=a=>a.reduce((s,x)=>s+Number(x.valor),0);
+  let cajaIni=Number(window._ini?.caja_inicial||0), neqIni=Number(window._ini?.nequi_inicial||0);
+  let cajaMov=hoyMovs.filter(x=>x.metodo==='EFECTIVO').reduce((s,x)=>s+(x.tipo==='INGRESO'?Number(x.valor):-Number(x.valor)),0);
+  let neqMov=hoyMovs.filter(x=>x.metodo==='NEQUI').reduce((s,x)=>s+(x.tipo==='INGRESO'?Number(x.valor):-Number(x.valor)),0);
+  document.getElementById('bCaja').textContent=fmt(cajaIni+cajaMov);
+  document.getElementById('bNequi').textContent=fmt(neqIni+neqMov);
+  document.getElementById('bIng').textContent=fmt(sum(ing)); document.getElementById('bIngN').textContent=ing.length+" ingresos";
+  document.getElementById('bEgr').textContent=fmt(sum(egr)); document.getElementById('bEgrN').textContent=egr.length+" egresos";
+  document.getElementById('bAho').textContent=fmt(sum(hoyMovs.filter(x=>x.metodo==='AHORRO')));
+  document.getElementById('bEle').textContent=fmt(sum(hoyMovs.filter(x=>x.metodo==='ELECTRONICO')));
+  document.getElementById('bMov').textContent=hoyMovs.length;
+  let tb="";
+  (data||[]).filter(x=>(!q||x.descripcion.toLowerCase().includes(q))&&(!t||x.tipo===t)&&(!m||x.metodo===m)).slice(0,50).forEach(x=>{
+    tb+=`<tr><td>${x.fecha}</td><td><b>${x.descripcion}</b><br><small style="color:var(--jk-muted)">${x.orden_num?'#'+String(x.orden_num).padStart(6,'0')+' ':''}${x.jk_tecnicos?.nombre||''} ${x.metodo}</small></td><td><span class="badge ${x.tipo}">${x.tipo}</span></td><td><b>${x.tipo==='EGRESO'?'-':'+'}${fmt(x.valor)}</b></td></tr>`;
+  });
+  document.getElementById('tbMov').innerHTML=tb||"<tr><td colspan=4>Sin movimientos</td></tr>";
+  pintarSemana();
+}
+async function cargarTecnicos(){
+  const {data} = await sb.from('jk_tecnicos').select('*').eq('activo',true);
+  const {data:ords} = await sb.from('jk_ordenes').select('tecnico_id,created_at');
+  const inicioSem=weekStart();
+  const contar=id=>(ords||[]).filter(o=>o.tecnico_id===id && new Date(o.created_at)>=inicioSem).length;
+  let L="",E="";
+  (data||[]).forEach(t=>{
+    const h=`<div style="background:#0f181b;border-radius:12px;padding:10px;margin:6px 0"><b>${t.nombre}</b> <small style="color:var(--jk-muted)">${t.tipo==='EXTERNO'?'· EXT':''}</small><br><span style="font-size:20px;font-weight:900">${contar(t.id)}</span> <small>REPARACIONES · ESTA SEMANA</small></div>`;
+    if(t.tipo==='LOCAL') L+=h; else E+=h;
+  });
+  document.getElementById('tecLocales').innerHTML=L||"Sin técnicos";
+  document.getElementById('tecExternos').innerHTML=E||"Sin técnicos";
+}
+async function cargarTecSelect(){
+  const {data}=await sb.from('jk_tecnicos').select('*').eq('activo',true);
+  document.getElementById('oTec').innerHTML=(data||[]).map(t=>`<option value="${t.id}">${t.nombre} (${t.tipo})</option>`).join('');
+}
+async function cargarPendientes(){
+  const {data}=await sb.from('jk_ordenes').select('id').neq('estado','ENTREGADO');
+  document.getElementById('pendientes').textContent=(data?.length||0)+" pendientes";
+}
+function weekStart(){let d=new Date();let day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); d.setHours(0,0,0,0); return d;}
+function pintarSemana(){
+  const ini=weekStart(), fin=new Date(ini); fin.setDate(ini.getDate()+6);
+  const f=d=>d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});
+  document.getElementById('semLabel').textContent=`${f(ini)} — ${f(fin)} · ACTUAL`;
+  let movs=(window._movs||[]).filter(x=>new Date(x.fecha)>=ini);
+  document.getElementById('semBox').innerHTML=movs.length?`<div style="font-size:13px">${movs.length} movimientos esta semana · Ingresos ${fmt(movs.filter(x=>x.tipo==='INGRESO').reduce((s,x)=>s+Number(x.valor),0))}</div>`:`<div style="text-align:center;color:var(--jk-muted);font-size:13px;margin:8px">Sin movimientos en la semana ${f(ini)} — ${f(fin)}</div>`;
+}
+function filtrarRep(tipo,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  let movs=window._movs||[]; let now=new Date(); let ini=new Date();
+  if(tipo==='DIA') ini.setHours(0,0,0,0);
+  if(tipo==='SEMANA') ini=weekStart();
+  if(tipo==='QUINCENA'){ini=new Date(now.getFullYear(),now.getMonth(),now.getDate()<=15?1:16);}
+  if(tipo==='MES'){ini=new Date(now.getFullYear(),now.getMonth(),1);}
+  if(tipo==='DIAN'){ini=new Date(now.getFullYear(),0,1);}
+  let f=movs.filter(x=>new Date(x.fecha)>=ini);
+  let ing=f.filter(x=>x.tipo==='INGRESO').reduce((s,x)=>s+Number(x.valor),0);
+  let egr=f.filter(x=>x.tipo==='EGRESO').reduce((s,x)=>s+Number(x.valor),0);
+  document.getElementById('repBox').innerHTML=`<b>${tipo}</b> desde ${ini.toLocaleDateString('es-CO')}<br>Ingresos: <b style="color:var(--jk-accent)">${fmt(ing)}</b> · Egresos: <b style="color:var(--jk-red)">${fmt(egr)}</b><br>Balance: <b>${fmt(ing-egr)}</b> · ${f.length} movimientos`;
+}
+async function guardarVenta(){
+  const d=document.getElementById('vDesc').value, v=Number(document.getElementById('vVal').value), m=document.getElementById('vMet').value;
+  if(!d||!v) return alert('Completa descripción y valor');
+  await sb.from('jk_movimientos').insert({descripcion:d,valor:v,tipo:'INGRESO',metodo:m,fecha:hoyISO()});
+  cerrarModales(); init();
+}
+async function guardarSalida(){
+  const d=document.getElementById('sDesc').value, v=Number(document.getElementById('sVal').value), m=document.getElementById('sMet').value;
+  if(!d||!v) return alert('Completa descripción y valor');
+  await sb.from('jk_movimientos').insert({descripcion:d,valor:v,tipo:'EGRESO',metodo:m,fecha:hoyISO()});
+  cerrarModales(); init();
+}
+async function guardarOrden(){
+  const c=document.getElementById('oCli').value, e=document.getElementById('oEq').value, tot=Number(document.getElementById('oTot').value||0), abo=Number(document.getElementById('oAbo').value||0), tec=document.getElementById('oTec').value;
+  if(!c||!e) return alert('Falta cliente y equipo');
+  const {data:ult}=await sb.from('jk_ordenes').select('numero').order('numero',{ascending:false}).limit(1).maybeSingle();
+  const num=(ult?.numero||64)+1;
+  await sb.from('jk_ordenes').insert({numero:num,cliente:c,equipo:e,total:tot,abono:abo,saldo:tot-abo,tecnico_id:tec});
+  if(abo>0) await sb.from('jk_movimientos').insert({descripcion:`Abono 1 orden #${String(num).padStart(6,'0')} — ${c} (${e})`,valor:abo,tipo:'INGRESO',metodo:'EFECTIVO',tecnico_id:tec,orden_num:num,fecha:hoyISO()});
+  cerrarModales(); init(); alert('Orden #'+String(num).padStart(6,'0')+' creada');
+}
+async function guardarTecnico(){
+  const n=document.getElementById('tNom').value, t=document.getElementById('tTipo').value;
+  if(!n) return alert('Pon nombre');
+  await sb.from('jk_tecnicos').insert({nombre:n,tipo:t});
+  cerrarModales(); init();
+}
+async function ajustarCaja(campo,valor){
+  valor=Number(valor||0);
+  await sb.from('jk_cajas').upsert({fecha:hoyISO(),[campo]:valor},{onConflict:'fecha'});
+  await sb.from('jk_cajas').update({[campo]:valor}).eq('fecha',hoyISO());
+  cerrarModales(); init();
+}
+init();
+setInterval(init,60000);
+</script>
+</body>
+</html>
