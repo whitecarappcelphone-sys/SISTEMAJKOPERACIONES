@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -312,6 +314,49 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
 .conta-egreso-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .conta-egreso-grid .submit { grid-column: 1 / -1; margin-top: 6px; }
 
+/* ============ NUEVO: AJUSTES MOVIL, TECNICO, EDICION DE FACTURAS, GRAFICAS PDF ============ */
+.rep-img { width: 100%; display: block; border-radius: 8px; border: 1px solid #e3eded; margin-bottom: 10px; }
+.btn-row2 { max-width: 840px; margin: 0 auto 25px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.btn-row2 button { height: 48px; border-radius: 14px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: .25s; border: 1px solid; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-row2 button:hover { transform: translateY(-2px); }
+.btn-tec { background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.45) !important; color: #c084fc; }
+.btn-edi { background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.45) !important; color: #fbbf24; }
+.tec-chat { height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: #101319; border: 1px solid rgba(18,216,196,.12); border-radius: 14px; margin-bottom: 12px; }
+.tec-msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.tec-msg.ia { align-self: flex-start; background: #171a21; border: 1px solid rgba(18,216,196,.2); color: #dfe3ea; }
+.tec-msg.user { align-self: flex-end; background: rgba(18,216,196,.18); color: #e8fffc; }
+.tec-sug { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tec-sug button { padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(18,216,196,.3); background: rgba(18,216,196,.08); color: #12d8c4; font-family: 'Poppins', sans-serif; font-size: 11px; cursor: pointer; }
+.tec-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.tec-links a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px; background: #171a21; border: 1px solid rgba(255,255,255,.1); color: #dfe3ea; font-size: 11px; text-decoration: none; }
+.tec-links a:hover { border-color: #12d8c4; color: #12d8c4; }
+.tec-form { display: flex; gap: 10px; align-items: center; }
+.tec-form input { flex: 1; }
+.tec-form button { width: 52px; height: 48px; flex-shrink: 0; justify-content: center; }
+.cfg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.cfg-grid .field.full { grid-column: 1 / -1; }
+.cfg-grid textarea { min-height: 84px; }
+.cfg-acc { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.cfg-acc .submit { margin-top: 0; flex: 1; }
+
+/* Checklist en movil: opciones Sí / No debajo de cada item, ocupando todo el ancho */
+@media (max-width: 700px) {
+    .chk-list { grid-template-columns: 1fr; }
+    .chk-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .chk-opts { width: 100%; }
+    .chk-pill { flex: 1; text-align: center; padding: 6px 8px; font-size: 10.5px; }
+    .cfg-grid { grid-template-columns: 1fr; }
+    .btn-row2 { grid-template-columns: 1fr; }
+}
+
+/* Fechas del histórico legibles en movil: columnas con ancho minimo, scroll horizontal y etiquetas inclinadas */
+.conta-bar-col small { white-space: nowrap; font-size: 9px; }
+@media (max-width: 700px) {
+    .conta-bars { height: 250px; gap: 6px; }
+    .conta-bar-col { min-width: 46px; }
+    .conta-bar-col small { display: block; width: 100%; text-align: right; transform-origin: top right; transform: rotate(-40deg); margin-top: 6px; }
+}
+
 /* PDF CONTABLE (se genera fuera de pantalla) */
 .conta-pdf { position: absolute; left: -10000px; top: 0; width: 750px; background: #ffffff; color: #111111; font-family: Arial, sans-serif; font-size: 12px; padding: 24px; }
 .conta-pdf-head { display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #12d8c4; padding-bottom: 14px; margin-bottom: 6px; }
@@ -540,6 +585,11 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
         </div>
         <!-- NUEVO: botón horizontal de contabilidad -->
         <button type="button" class="btn-contabilidad" onclick="abrirContabilidad()"><i class="fa-solid fa-scale-balanced"></i> CONTABILIDAD</button>
+<!-- NUEVO: BOTONES TECNICO Y EDICION DE FACTURAS -->
+<div class="btn-row2">
+    <button type="button" class="btn-tec" onclick="abrirTecnico()"><i class="fa-solid fa-robot"></i> TÉCNICO</button>
+    <button type="button" class="btn-edi" onclick="abrirEdicionFacturas()"><i class="fa-solid fa-file-pen"></i> EDICIÓN DE FACTURAS</button>
+</div>
 
 <!-- NUEVO: KPIs TALLER -->
 <div class="panel-sec">
@@ -1094,6 +1144,48 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
     </div>
 </div>
 
+<!-- NUEVO: MODAL TECNICO IA -->
+<div class="form-modal" id="modal_tecnico">
+    <div class="form-modal-content conta-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_tecnico')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="conta-wrap">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-robot"></i></div>
+                <div><h3>Técnico IA</h3><p>Pregunta sobre reparación de celulares y equipos tecnológicos.</p></div>
+            </div>
+            <div id="tec_chat" class="tec-chat"><div class="tec-msg ia">Hola, soy tu asistente técnico. Pregúntame sobre reparaciones de celulares y equipos tecnológicos.</div></div>
+            <div class="tec-sug">
+                <button type="button" onclick="tecnicoSugerir('Celular no carga: qué debo revisar')">Celular no carga</button>
+                <button type="button" onclick="tecnicoSugerir('Pantalla táctil no responde: pasos de diagnóstico')">Pantalla táctil no responde</button>
+                <button type="button" onclick="tecnicoSugerir('Sensor de proximidad falla: causas y solución')">Sensor de proximidad</button>
+                <button type="button" onclick="tecnicoSugerir('Cómo cambiar la batería de un iPhone')">Cambio de batería</button>
+            </div>
+            <form id="form_tecnico" class="tec-form" onsubmit="event.preventDefault(); tecnicoPreguntar();">
+                <input type="text" id="tec_pregunta" placeholder="Escribe tu pregunta técnica..." autocomplete="off" required>
+                <button type="submit" class="conta-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- NUEVO: MODAL EDICION DE FACTURAS -->
+<div class="form-modal" id="modal_config">
+    <div class="form-modal-content conta-content">
+        <button type="button" class="modal-close" onclick="cerrarModalFormulario('modal_config')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="conta-wrap">
+            <div class="form-header">
+                <div class="form-icon"><i class="fa-solid fa-file-pen"></i></div>
+                <div><h3>Edición de facturas</h3><p>Lo que guardes aquí reemplaza los datos de fábrica en facturas, órdenes de servicio, PDFs y mensajes de WhatsApp.</p></div>
+            </div>
+            <div id="cfg_form" class="cfg-grid"></div>
+            <div class="cfg-acc">
+                <button type="button" class="conta-btn" onclick="cfgRestaurar()"><i class="fa-solid fa-rotate-left"></i> Restaurar datos de fábrica</button>
+                <button type="button" class="submit" onclick="cfgGuardar()"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL ANIMADO: INICIAR SESIÓN / REGISTRO DE ASESOR (SE HACE UNA SOLA VEZ) -->
 <div class="form-modal" id="modal_sesion">
     <div class="form-modal-content">
@@ -1140,15 +1232,15 @@ input.validado { border-color: #12d8c4 !important; background: rgba(18,216,196,.
 <div id="modalFactura" class="modal-overlay"><div class="modal-content"><h3><i class="fa-solid fa-file-invoice"></i> Acciones de Factura</h3><p>Selecciona cómo deseas generar o enviar el comprobante:</p><div id="resumenFactura" class="resumen-box">Cargando datos...</div><div class="modal-buttons"><button type="button" class="btn-option btn-pdf" onclick="appCore.descargarPDF()"><i class="fa-solid fa-file-pdf"></i> Imprimir / Guardar PDF Blanco</button><button type="button" class="btn-option btn-whatsapp" onclick="appCore.enviarPorWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Enviar Texto por WhatsApp</button><button type="button" class="btn-option btn-cerrar" onclick="document.getElementById('modalFactura').style.display='none'"><i class="fa-solid fa-xmark"></i> Cancelar</button></div></div></div>
 
 <div class="pdf-container" id="pdf-invoice">
-    <div class="pdf-header"><h1>ACCESORIOS JK</h1><p>NIT:1005715210 Comprobante de Operación Comercial REGIMEN SIMPLIFICADO</p></div>
+    <div class="pdf-header"><h1 id="cfg-empresa">ACCESORIOS JK</h1><p id="cfg-linea">NIT:1005715210 Comprobante de Operación Comercial REGIMEN SIMPLIFICADO</p></div>
     <div class="pdf-row"><div><strong>Cliente:</strong> <span id="pdf-cliente"></span></div><div><strong>Fecha:</strong> <span id="pdf-fecha"></span></div></div>
     <div class="pdf-row"><div><strong>Teléfono:</strong> <span id="pdf-telefono"></span></div><div><strong>Factura N°:</strong> <span id="pdf-numero"></span></div></div>
     <!-- NUEVO: IMEI en la factura -->
     <div class="pdf-row" id="pdf-imei-row"><div><strong>IMEI / Serial:</strong> <span id="pdf-imei"></span></div></div>
     <table class="pdf-table"><thead><tr><th>Descripción</th><th>Cant</th><th>V. Unitario</th><th>Total</th></tr></thead><tbody><tr><td id="pdf-desc"></td><td id="pdf-cant"></td><td id="pdf-vunit"></td><td id="pdf-vtotal"></td></tr></tbody></table>
     <div class="pdf-totals"><div><span>Subtotal:</span><span id="pdf-subtotal"></span></div><div><span>Tipo de Pago:</span><span id="pdf-tipopago"></span></div><div><span>Valor Abonado:</span><span id="pdf-abono"></span></div><div class="neto"><span>SALDO PENDIENTE:</span><span id="pdf-pendiente"></span></div></div>
-    <div class="pdf-garantia"><p><strong>TÉRMINOS DE GARANTÍA:</strong> <span id="pdf-garantia-texto">La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.</span></p><div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>DIRECCIÓN:</strong> Calle 14 # 2-67 Centro Ibagué-Tolima | <strong>SERVICIOS:</strong> Técnico profesional y telefonía.</div></div>
-    <div class="pdf-signatures"><div class="signature-box">Recibí Conforme<br><br><span id="pdf-firma-cliente"></span></div><div class="signature-box">Autorizado<br><br>ACCESORIOS JK</div></div>
+    <div class="pdf-garantia"><p><strong>TÉRMINOS DE GARANTÍA:</strong> <span id="pdf-garantia-texto">La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.</span></p><div style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px;"><strong>DIRECCIÓN:</strong> <span id="cfg-direccion">Calle 14 # 2-67 Centro Ibagué-Tolima</span> | <strong>SERVICIOS:</strong> <span id="cfg-servicios">Técnico profesional y telefonía.</span></div></div>
+    <div class="pdf-signatures"><div class="signature-box">Recibí Conforme<br><br><span id="pdf-firma-cliente"></span></div><div class="signature-box">Autorizado<br><br><span id="cfg-firma">ACCESORIOS JK</span></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1163,7 +1255,7 @@ let datosFacturaActual = {};
 const PREFIJO_FACTURA = "JK/";
 
 // NUEVO: texto de garantía por defecto (el original de la factura)
-const GARANTIA_POR_DEFECTO = "La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.";
+let GARANTIA_POR_DEFECTO = "La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.";
 
 // ============================================================
 // NUEVO: INICIO DE SESIÓN / REGISTRO DE ASESOR CON PIN (UNA SOLA VEZ)
@@ -1678,15 +1770,15 @@ const appCore = {
         document.getElementById('pdf-garantia-texto').innerText = textoGarantia;
         document.getElementById('pdf-firma-cliente').innerHTML = `${cliente}<br>(Asesor: ${asesor})`;
 
-        let msg = `*ACCESORIOS JK*%0A*NIT:* 1005715210%0A*RÉGIMEN:* SIMPLIFICADO%0A*SERVICIO TÉCNICO Y TELEFONÍA*%0A*DIRECCIÓN:* Calle 114 %232 67 Centro Ibagué - Tolima%0A%0A*COMPROBANTE DE COMPRA*%0A--------------------------------%0A*Comprobante N°:* ${numFactura}%0A*Fecha:* ${fechaStr}%0A*Hora:* ${horaStr}%0A%0A*DATOS DEL CLIENTE:*%0A*Cliente:* ${encodeURIComponent(cliente)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A%0A*DETALLE DE LA OPERACIÓN:*%0A*Equipo:* ${encodeURIComponent(desc.replace("Reparación: ", ""))}%0A*IMEI / Serial:* ${encodeURIComponent(textoImei)}%0A`;
+        let msg = `*${encodeURIComponent(JK_CFG.empresa)}*%0A*NIT:* ${encodeURIComponent(JK_CFG.nit)}%0A*RÉGIMEN:* ${encodeURIComponent(JK_CFG.regimen)}%0A*${encodeURIComponent(JK_CFG.servicios)}*%0A*DIRECCIÓN:* ${encodeURIComponent(JK_CFG.direccion)}%0A%0A*COMPROBANTE DE COMPRA*%0A--------------------------------%0A*Comprobante N°:* ${numFactura}%0A*Fecha:* ${fechaStr}%0A*Hora:* ${horaStr}%0A%0A*DATOS DEL CLIENTE:*%0A*Cliente:* ${encodeURIComponent(cliente)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A%0A*DETALLE DE LA OPERACIÓN:*%0A*Equipo:* ${encodeURIComponent(desc.replace("Reparación: ", ""))}%0A*IMEI / Serial:* ${encodeURIComponent(textoImei)}%0A`;
         if (prefijo === 'rep') { msg += `*Descripción de la falla:*%0A${encodeURIComponent(falla)}%0A`; } else { msg += `*Cantidad:* ${cantidadItems}%0A`; }
         msg += `%0A*TOTAL A PAGAR:* ${appCore.formatoMoneda(totalOperacion)}%0A`;
         if (tipoPago === 'Abono') { msg += `*Tipo de pago:* Abono%0A*Abono realizado:* ${appCore.formatoMoneda(abono)}%0A*Saldo pendiente:* ${appCore.formatoMoneda(pendiente)}%0A`; } else { msg += `*Tipo de pago:* Pago completo%0A*Total pagado:* ${appCore.formatoMoneda(totalOperacion)}%0A`; }
-        msg += `*Método de pago:* ${encodeURIComponent(metodoPago)}%0A*Nombre de asesor:* ${encodeURIComponent(asesor)}%0A%0A--------------------------------%0A*¡GRACIAS POR SU COMPRA!*%0A%0A`;
+        msg += `*Método de pago:* ${encodeURIComponent(metodoPago)}%0A*Nombre de asesor:* ${encodeURIComponent(asesor)}%0A%0A--------------------------------%0A*${encodeURIComponent(JK_CFG.mensajeGracias)}*%0A%0A`;
         if (garantiaPersonalizada) {
             msg += `*TÉRMINOS DE GARANTÍA:*%0A${encodeURIComponent(textoGarantia).replace(/%0A/g, '%0A')}`;
         } else {
-            msg += `*NOTA:*%0A Garantía de 30 días por defectos de fábrica.%0A Debe conservar este ticket y el producto con sellos intactos.`;
+            msg += `*NOTA:*%0A${encodeURIComponent(JK_CFG.notaGarantia)}`;
         }
 
         datosFacturaActual = { mensaje: msg, telefono: telefono.replace(/\D/g, ''), numeroFactura: numFactura, falla: falla };
@@ -1956,7 +2048,7 @@ function contaTextoPeriodo(p, r) {
 }
 
 // Histórico: 'dia' = últimos 14 días, 'semana' = últimas 8 semanas (desde lunes)
-function contaHistorico(tipo) {
+function contaHistorico_old(tipo) {
     const ahora = new Date();
     const filas = [];
     if (tipo === 'dia') {
@@ -2621,7 +2713,7 @@ async function cotGuardar() {
 
 function cotNumeroWA(num) { return num.length === 10 ? '57' + num : num; }
 
-function cotMensajeWA(d) {
+function cotMensajeWA_old(d) {
     const lineas = (d.items || []).map((i, idx) => `${idx + 1}. ${i.descripcion} x${i.cantidad} — ${pnlFmt(i.precio)} c/u = ${pnlFmt(i.subtotal)}`);
     return [
         '*ACCESORIOS JK · SOLICITUD DE COTIZACIÓN*',
@@ -2699,7 +2791,7 @@ function cotPDF() {
 }
 
 // ---------- BLOQUES DEL PDF PROFESIONAL ----------
-function repMembrete(titulo, subtitulo, meta) {
+function repMembrete_old(titulo, subtitulo, meta) {
     return `
     <div class="rep-band">
         <div class="rep-logo">JK</div>
@@ -2729,7 +2821,7 @@ function repTabla(head, rows, numCols = [], filaTotal = -1) {
 }
 
 // Genera el PDF a partir de HTML, con numeración de páginas y pie de página
-function panelGenerarPDF(html, filename) {
+function panelGenerarPDF_old(html, filename) {
     const overlay = document.createElement('div');
     overlay.className = 'rep-overlay';
     overlay.innerHTML = '<div class="rep-loader"><i class="fa-solid fa-file-pdf"></i><span>Generando PDF profesional…</span></div>';
@@ -2798,7 +2890,7 @@ function cotHTML(d, prov) {
 }
 
 // ---------- REPORTE CONTABLE PDF (VERSION PROFESIONAL) ----------
-function contaReportePDFv2() {
+function contaReportePDFv2_old() {
     if (!contaEstado.ultimo) { mostrarAlertaError('Primero carga la contabilidad.'); return; }
     const { t, ops, egr, r } = contaEstado.ultimo;
     const sesion = obtenerSesion() || {};
@@ -3127,7 +3219,7 @@ function repFacturaHTML(d) {
         <tr><td>Abono / anticipo</td><td class="num">${contaFmt(d.abono)}</td></tr>
         <tr class="total"><td>SALDO PENDIENTE</td><td class="num">${contaFmt(saldo)}</td></tr>
     </tbody></table></div></div>`;
-    h += `<div class="rep-sec"><h3>Términos y condiciones</h3><p class="rep-nota">La garantía cubre únicamente la reparación realizada y los componentes revisados en este documento. No cubre golpes, humedad posterior a la entrega, manipulación por terceros ni daños por sobrecarga eléctrica. Presente esta factura para cualquier reclamación. Método de pago: ${contaEsc(d.metodo || 'N/A')} (${contaEsc(d.tipoPago || '')}).</p></div>`;
+    h += `<div class="rep-sec"><h3>Términos y condiciones</h3><p class="rep-nota">${contaEsc(JK_CFG.terminosTaller)} Presente esta factura para cualquier reclamación. Método de pago: ${contaEsc(d.metodo || 'N/A')} (${contaEsc(d.tipoPago || '')}).</p></div>`;
     const firmaImg = d.firmaSrc ? `<img src="${d.firmaSrc}" alt="Firma" style="max-height:70px;display:block;margin:0 auto 4px;">` : '<div style="height:70px;"></div>';
     return h + repCierre(repFirmas(`${firmaImg}Recibí conforme (cliente)<br>${contaEsc(d.cliente || '')}`, `<div style="height:70px;"></div>Entregado por<br>${contaEsc(d.asesor || 'ACCESORIOS JK')}`));
 }
@@ -3167,7 +3259,7 @@ function ftDescargar() {
         appCore.mostrarAvisoPDF();
     }).catch(e => { console.error(e); mostrarAlertaError('No se pudo generar el PDF.'); });
 }
-function ftMensajeCliente(d) {
+function ftMensajeCliente_old(d) {
     const saldo = Math.max(0, d.total - d.abono);
     return [
         '*ACCESORIOS JK · SERVICIO TÉCNICO*',
@@ -3207,7 +3299,7 @@ async function ftEnviar() {
 }
 
 // Versión del PDF con los mismos membretes: crea el documento y devuelve jsPDF
-function repRenderPDF(html) {
+function repRenderPDF_old(html) {
     const overlay = document.createElement('div');
     overlay.className = 'rep-overlay';
     overlay.innerHTML = '<div class="rep-loader"><i class="fa-solid fa-file-pdf"></i><span>Generando PDF profesional…</span></div>';
@@ -3295,6 +3387,486 @@ async function repGuardarCompleto() {
 // ---------- INICIO ----------
 repChecklistInit();
 firmaInit();
+</script>
+<script>
+/* =====================================================================
+   NUEVO: CONFIGURACION DE FACTURAS (EDICION DE FACTURAS)
+   ===================================================================== */
+const JK_CFG_DEFAULT = {
+    empresa: 'ACCESORIOS JK',
+    nit: '1005715210',
+    regimen: 'REGIMEN SIMPLIFICADO',
+    subtitulo: 'Comprobante de Operación Comercial',
+    direccion: 'Calle 14 # 2-67 Centro Ibagué-Tolima',
+    servicios: 'Técnico profesional y telefonía',
+    garantia: "La garantía de todo producto o reparación es de 30 días calendario contados a partir de la emisión de este comprobante. No cubre golpes directos, ingreso de humedad, manipulación de terceros ajenos a la tienda, sobrecargas eléctricas, ni remoción de sellos de seguridad instalados en los repuestos o equipos.",
+    notaGarantia: 'Garantía de 30 días por defectos de fábrica.\nDebe conservar este ticket y el producto con sellos intactos.',
+    mensajeGracias: '¡GRACIAS POR SU COMPRA!',
+    firmaAutorizado: 'ACCESORIOS JK',
+    terminosTaller: 'La garantía cubre únicamente la reparación realizada y los componentes revisados en este documento. No cubre golpes, humedad posterior a la entrega, manipulación por terceros ni daños por sobrecarga eléctrica.',
+    cierreTaller: 'Adjuntamos el comprobante PDF con el detalle, la revisión del equipo y los términos de garantía. ¡Gracias por confiar en nosotros!',
+    pieReportes: 'Documento generado automáticamente'
+};
+const JK_CFG = Object.assign({}, JK_CFG_DEFAULT);
+const CFG_CAMPOS = [
+    ['empresa', 'Nombre de la empresa (encabezado)', 'text'],
+    ['nit', 'NIT', 'text'],
+    ['regimen', 'Régimen', 'text'],
+    ['subtitulo', 'Subtítulo del comprobante', 'text'],
+    ['direccion', 'Dirección', 'text'],
+    ['servicios', 'Servicios (línea de pie de factura)', 'text'],
+    ['garantia', 'Términos de garantía en factura de venta (por defecto)', 'area'],
+    ['notaGarantia', 'Nota de garantía en mensajes de WhatsApp', 'area'],
+    ['terminosTaller', 'Términos en la factura final del taller', 'area'],
+    ['cierreTaller', 'Texto de cierre del mensaje al cliente (taller)', 'area'],
+    ['mensajeGracias', 'Mensaje de agradecimiento (WhatsApp)', 'text'],
+    ['firmaAutorizado', 'Texto de firma "Autorizado"', 'text'],
+    ['pieReportes', 'Texto del pie de página de reportes', 'text']
+];
+
+function cfgAplicarDOM() {
+    const set = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+    set('cfg-empresa', JK_CFG.empresa);
+    set('cfg-linea', 'NIT:' + JK_CFG.nit + ' ' + JK_CFG.subtitulo + ' ' + JK_CFG.regimen);
+    set('cfg-direccion', JK_CFG.direccion);
+    set('cfg-servicios', JK_CFG.servicios);
+    set('cfg-firma', JK_CFG.firmaAutorizado);
+}
+async function cfgCargar() {
+    try {
+        const { data, error } = await window.jkSupabase.from('configuracion_factura').select('datos').eq('id', 1).maybeSingle();
+        if (error) throw error;
+        if (data && data.datos) Object.assign(JK_CFG, JK_CFG_DEFAULT, data.datos);
+    } catch (e) {
+        console.warn('Configuración no disponible; se usan los datos de fábrica.', e);
+    }
+    GARANTIA_POR_DEFECTO = JK_CFG.garantia;
+    cfgAplicarDOM();
+}
+function abrirEdicionFacturas() {
+    if (!obtenerSesion()) { mostrarAlertaError('Debes iniciar sesión para editar las facturas.'); abrirModalSesion(); return; }
+    document.getElementById('cfg_form').innerHTML = CFG_CAMPOS.map(([k, l, t]) => `
+        <div class="field ${t === 'area' ? 'full' : ''}"><label>${l}</label>
+        ${t === 'area' ? `<textarea id="cfg_${k}">${contaEsc(JK_CFG[k])}</textarea>` : `<input type="text" id="cfg_${k}" value="${contaEsc(JK_CFG[k])}">`}
+        </div>`).join('');
+    abrirModalFormulario('modal_config');
+}
+async function cfgGuardar() {
+    if (!obtenerSesion()) { mostrarAlertaError('Debes iniciar sesión para guardar cambios.'); return; }
+    const datos = {};
+    CFG_CAMPOS.forEach(([k]) => { datos[k] = (document.getElementById('cfg_' + k).value || '').trim() || JK_CFG_DEFAULT[k]; });
+    const { error } = await window.jkSupabase.from('configuracion_factura').upsert([{ id: 1, datos: datos, updated_at: new Date().toISOString() }], { onConflict: 'id' });
+    if (error) { mostrarAlertaError('No se pudo guardar: ' + error.message); return; }
+    Object.assign(JK_CFG, datos);
+    GARANTIA_POR_DEFECTO = JK_CFG.garantia;
+    cfgAplicarDOM();
+    mostrarAlertaExito('Facturas actualizadas. Los nuevos datos se usarán en PDFs y mensajes.');
+    cerrarModalFormulario('modal_config');
+}
+async function cfgRestaurar() {
+    if (!obtenerSesion()) { mostrarAlertaError('Debes iniciar sesión para restaurar.'); return; }
+    if (!confirm('¿Restaurar los datos de fábrica de las facturas?')) return;
+    const { error } = await window.jkSupabase.from('configuracion_factura').upsert([{ id: 1, datos: JK_CFG_DEFAULT, updated_at: new Date().toISOString() }], { onConflict: 'id' });
+    if (error) { mostrarAlertaError('No se pudo restaurar: ' + error.message); return; }
+    Object.assign(JK_CFG, JK_CFG_DEFAULT);
+    GARANTIA_POR_DEFECTO = JK_CFG.garantia;
+    cfgAplicarDOM();
+    abrirEdicionFacturas();
+    mostrarAlertaExito('Datos de fábrica restaurados.');
+}
+
+// Versiones que usan la configuración editable
+function repMembrete(titulo, subtitulo, meta) {
+    const c = JK_CFG;
+    return `
+    <div class="rep-band">
+        <div class="rep-logo">JK</div>
+        <div class="rep-brand">
+            <h1>${contaEsc(c.empresa)}</h1>
+            <p>NIT: ${contaEsc(c.nit)} · ${contaEsc(c.regimen)}</p>
+            <p>${contaEsc(c.servicios)} · ${contaEsc(c.direccion)}</p>
+        </div>
+        <div class="rep-meta">${meta.map(m => `<div><strong>${contaEsc(m[0])}:</strong> ${contaEsc(m[1])}</div>`).join('')}</div>
+    </div>
+    <div class="rep-title"><h2>${contaEsc(titulo)}</h2><span>${contaEsc(subtitulo)}</span></div>
+    <div class="rep-body">`;
+}
+function ftMensajeCliente(d) {
+    const saldo = Math.max(0, d.total - d.abono);
+    return [
+        `*${JK_CFG.empresa} · SERVICIO TÉCNICO*`,
+        `Hola ${d.cliente || ''}, le enviamos el detalle de su equipo:`,
+        `Factura: ${d.numero || ''}`,
+        `Equipo: ${d.equipo || ''}`,
+        `Estado actual: ${repEtiquetaEstado(d.estadoRaw)}`,
+        `Garantía: ${d.dias > 0 ? d.dias + ' días' : 'no aplica'}`,
+        `Saldo pendiente: ${contaFmt(saldo)}`,
+        d.observacion ? `Observaciones: ${d.observacion}` : '',
+        '',
+        JK_CFG.cierreTaller
+    ].filter(x => x !== '').join('\n');
+}
+function cotMensajeWA(d) {
+    const lineas = (d.items || []).map((i, idx) => `${idx + 1}. ${i.descripcion} x${i.cantidad} — ${pnlFmt(i.precio)} c/u = ${pnlFmt(i.subtotal)}`);
+    return [
+        `*${JK_CFG.empresa} · SOLICITUD DE COTIZACIÓN*`,
+        `N° ${d.numero}`,
+        `Fecha: ${pnlFechaCorta(d.created_at)}`,
+        `Proveedor: ${d.proveedor_nombre}`,
+        `Tipo: ${d.tipo}`,
+        '',
+        '*Ítems:*',
+        ...lineas,
+        '',
+        `Subtotal: ${pnlFmt(d.subtotal)}`,
+        `IVA (${d.iva_pct}%): ${pnlFmt(d.iva_valor)}`,
+        `*TOTAL: ${pnlFmt(d.total)}*`,
+        d.vigencia ? `Vigencia: ${pnlFechaCorta(d.vigencia)}` : '',
+        d.notas ? `Notas: ${d.notas}` : '',
+        '',
+        'Por favor confirmar disponibilidad y precio. Gracias.'
+    ].join('\n');
+}
+
+/* =====================================================================
+   NUEVO: TECNICO IA (gratuita, sin clave) + enlaces de respaldo
+   ===================================================================== */
+const TEC_SYSTEM = 'Eres un técnico experto en reparación de celulares y equipos tecnológicos (pantallas, baterías, conectores de carga, cámaras, micrófono, altavoz, Face ID, WiFi, señal, humedad y software). Responde siempre en español, de forma práctica, con pasos numerados y advertencias de seguridad. Si la pregunta no es sobre reparación de equipos tecnológicos, indícalo amablemente y no respondas el tema. Sé conciso (máximo 250 palabras).';
+const TEC_HISTORIAL = [];
+
+function tecAgregar(rol, texto) {
+    const chat = document.getElementById('tec_chat');
+    const div = document.createElement('div');
+    div.className = 'tec-msg ' + rol;
+    div.innerText = texto;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+}
+function tecAgregarEnlaces(q) {
+    const chat = document.getElementById('tec_chat');
+    const term = encodeURIComponent('reparación ' + q);
+    const div = document.createElement('div');
+    div.className = 'tec-links';
+    div.innerHTML = `
+        <a href="https://www.youtube.com/results?search_query=${term}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i> Videos en YouTube</a>
+        <a href="https://www.ifixit.com/Search?query=${term}" target="_blank" rel="noopener"><i class="fa-solid fa-wrench"></i> Guías en iFixit</a>
+        <a href="https://www.google.com/search?q=${term}" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Buscar en Google</a>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+function abrirTecnico() {
+    abrirModalFormulario('modal_tecnico');
+    setTimeout(() => { const i = document.getElementById('tec_pregunta'); if (i) i.focus(); }, 400);
+}
+function tecnicoSugerir(texto) { tecnicoPreguntar(texto); }
+async function tecnicoPreguntar(texto) {
+    const input = document.getElementById('tec_pregunta');
+    const q = (texto || input.value || '').trim();
+    if (!q) return;
+    input.value = '';
+    tecAgregar('user', q);
+    const cargando = tecAgregar('ia', 'Pensando…');
+    const btn = document.querySelector('#form_tecnico button');
+    if (btn) btn.disabled = true;
+    let respuesta = null;
+    try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 30000);
+        const res = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'openai-fast',
+                messages: [{ role: 'system', content: TEC_SYSTEM }, ...TEC_HISTORIAL.slice(-6), { role: 'user', content: q }]
+            }),
+            signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const j = await res.json();
+        respuesta = j.choices && j.choices[0] && j.choices[0].message ? String(j.choices[0].message.content || '').trim() : null;
+    } catch (e) {
+        console.warn('IA no disponible:', e);
+    }
+    cargando.remove();
+    if (respuesta) {
+        TEC_HISTORIAL.push({ role: 'user', content: q }, { role: 'assistant', content: respuesta });
+        tecAgregar('ia', respuesta);
+    } else {
+        tecAgregar('ia', 'La IA gratuita no respondió en este momento (es un servicio compartido con límite de uso, espera unos segundos entre preguntas). Te dejo enlaces con videos y guías para tu caso:');
+    }
+    tecAgregarEnlaces(q);
+    if (btn) btn.disabled = false;
+}
+
+/* =====================================================================
+   NUEVO: GRAFICAS Y REPORTE CONTABLE SEGUN EL FILTRO
+   ===================================================================== */
+function contaCompactaFecha(d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
+function contaArmarFilas(filas, r) {
+    const dentro = fecha => !r || !r.desde || contaEnIntervalo(fecha, r.desde, r.hasta);
+    return filas.map(f => {
+        const ops = contaEstado.ops.filter(o => contaEnIntervalo(o.created_at, f.desde, f.hasta) && dentro(o.created_at));
+        const egr = contaEstado.egr.filter(e => contaEnIntervalo(e.fecha, f.desde, f.hasta) && dentro(e.fecha));
+        const t = contaCalcular(ops, egr);
+        return { etiqueta: f.etiqueta, ingresos: t.ingresos, egresos: t.egresos, electronicos: t.electronicos, balance: t.balance };
+    });
+}
+// Histórico de pantalla (etiquetas compactas)
+function contaHistorico(tipo) {
+    const ahora = new Date();
+    const filas = [];
+    if (tipo === 'dia') {
+        for (let i = 13; i >= 0; i--) {
+            const desde = contaInicioDia(ahora); desde.setDate(desde.getDate() - i);
+            const hasta = new Date(desde); hasta.setDate(hasta.getDate() + 1);
+            const dia = desde.toLocaleDateString('es-CO', { weekday: 'short' }).replace('.', '');
+            filas.push({ etiqueta: dia + ' ' + contaCompactaFecha(desde), desde, hasta });
+        }
+    } else {
+        const base = contaInicioSemana(ahora);
+        for (let i = 7; i >= 0; i--) {
+            const desde = new Date(base); desde.setDate(desde.getDate() - 7 * i);
+            const hasta = new Date(desde); hasta.setDate(hasta.getDate() + 7);
+            const fin = new Date(hasta); fin.setDate(fin.getDate() - 1);
+            filas.push({ etiqueta: contaCompactaFecha(desde) + '–' + contaCompactaFecha(fin), desde, hasta });
+        }
+    }
+    return contaArmarFilas(filas, null);
+}
+// Histórico del PDF: solo dentro del periodo seleccionado (Hoy / Semana / Mes / Todo)
+function contaHistoricoPeriodo(modo, r) {
+    const hoy = contaInicioDia(new Date());
+    const minimo = new Date(hoy); minimo.setDate(minimo.getDate() - (modo === 'dia' ? 61 : 175));
+    let inicio = r.desde;
+    if (!inicio) {
+        const fechas = [...contaEstado.ops.map(o => new Date(o.created_at).getTime()), ...contaEstado.egr.map(e => new Date(e.fecha).getTime())].filter(x => !isNaN(x));
+        inicio = fechas.length ? new Date(Math.min(...fechas)) : new Date(hoy);
+    }
+    if (inicio < minimo) inicio = new Date(minimo);
+    const filas = [];
+    if (modo === 'dia') {
+        let d = contaInicioDia(inicio);
+        while (d <= hoy) {
+            const h = new Date(d); h.setDate(h.getDate() + 1);
+            const dia = d.toLocaleDateString('es-CO', { weekday: 'short' }).replace('.', '');
+            filas.push({ etiqueta: dia + ' ' + contaCompactaFecha(d), desde: new Date(d), hasta: h });
+            d = h;
+        }
+    } else {
+        let d = contaInicioSemana(inicio);
+        const ultima = contaInicioSemana(hoy);
+        while (d <= ultima) {
+            const h = new Date(d); h.setDate(h.getDate() + 7);
+            const fin = new Date(h); fin.setDate(fin.getDate() - 1);
+            filas.push({ etiqueta: contaCompactaFecha(d) + '–' + contaCompactaFecha(fin), desde: new Date(d), hasta: h });
+            d = h;
+        }
+    }
+    return contaArmarFilas(filas, r);
+}
+
+function contaCorto(v) {
+    v = Number(v) || 0;
+    if (Math.abs(v) >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (Math.abs(v) >= 1e3) return Math.round(v / 1e3) + 'k';
+    return String(Math.round(v));
+}
+function contaGraficoBalance(filas, titulo) {
+    const W = 1400, H = 640, pad = { l: 110, r: 30, t: 100, b: 150 };
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#0b2e33'; g.font = 'bold 30px Arial'; g.fillText(titulo, 40, 50);
+    g.fillStyle = '#16a34a'; g.fillRect(W - 330, 22, 22, 22);
+    g.fillStyle = '#333333'; g.font = '22px Arial'; g.fillText('Ingresos', W - 300, 42);
+    g.fillStyle = '#dc2626'; g.fillRect(W - 160, 22, 22, 22);
+    g.fillStyle = '#333333'; g.fillText('Egresos', W - 130, 42);
+    if (!filas.length) { g.fillStyle = '#777777'; g.font = '26px Arial'; g.fillText('Sin datos en el periodo', pad.l, 200); return c.toDataURL('image/png'); }
+    const max = Math.max(1, ...filas.map(f => Math.max(f.ingresos, f.egresos)));
+    const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    g.strokeStyle = '#e3eded'; g.lineWidth = 2; g.fillStyle = '#555555'; g.font = '20px Arial';
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.t + ih - ih * i / 4;
+        g.beginPath(); g.moveTo(pad.l, y); g.lineTo(W - pad.r, y); g.stroke();
+        g.fillText(contaCorto(max * i / 4), 12, y + 7);
+    }
+    const grp = iw / filas.length;
+    const bw = Math.max(6, Math.min(34, grp * 0.36));
+    filas.forEach((f, i) => {
+        const cx = pad.l + grp * i + grp / 2;
+        const hi = f.ingresos / max * ih, he = f.egresos / max * ih;
+        g.fillStyle = '#16a34a'; g.fillRect(cx - bw - 2, pad.t + ih - hi, bw, hi);
+        g.fillStyle = '#dc2626'; g.fillRect(cx + 2, pad.t + ih - he, bw, he);
+        g.save();
+        g.translate(cx, pad.t + ih + 14);
+        g.rotate(-Math.PI / 4);
+        g.fillStyle = '#333333'; g.textAlign = 'right'; g.font = '19px Arial';
+        g.fillText(f.etiqueta, 0, 0);
+        g.restore();
+    });
+    return c.toDataURL('image/png');
+}
+function contaGraficoPie(items, titulo) {
+    const W = 1400, H = Math.max(460, 200 + items.length * 110);
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#0b2e33'; g.font = 'bold 30px Arial'; g.fillText(titulo, 40, 50);
+    const total = items.reduce((s, i) => s + (Number(i.value) || 0), 0);
+    if (!total) { g.fillStyle = '#777777'; g.font = '26px Arial'; g.fillText('Sin ingresos en el periodo', 40, 140); return c.toDataURL('image/png'); }
+    const cx = 330, cy = 270, r = 160;
+    let a = -Math.PI / 2;
+    items.forEach(it => {
+        const v = Number(it.value) || 0;
+        if (!v) return;
+        const ang = v / total * 2 * Math.PI;
+        g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, r, a, a + ang); g.closePath();
+        g.fillStyle = it.color; g.fill();
+        a += ang;
+    });
+    let y = 170;
+    items.forEach(it => {
+        const pct = (Number(it.value) || 0) / total * 100;
+        g.fillStyle = it.color; g.fillRect(620, y - 22, 26, 26);
+        g.fillStyle = '#222222'; g.font = '26px Arial'; g.fillText(it.label, 665, y);
+        g.font = 'bold 26px Arial'; g.fillText(contaFmt(it.value) + '  (' + pct.toFixed(1) + '%)', 665, y + 36);
+        y += 110;
+    });
+    return c.toDataURL('image/png');
+}
+
+// Motor de PDF: captura la página desde arriba (evita el PDF en blanco cuando la pantalla está desplazada),
+// corta entre secciones para no partir tablas ni gráficas, y numera las páginas.
+async function repCrearPDFCanvas(html) {
+    const overlay = document.createElement('div');
+    overlay.className = 'rep-overlay';
+    overlay.innerHTML = '<div class="rep-loader"><i class="fa-solid fa-file-pdf"></i><span>Generando PDF profesional…</span></div>';
+    const cont = document.createElement('div');
+    cont.className = 'rep-pdf';
+    cont.innerHTML = html;
+    document.body.appendChild(overlay);
+    document.body.appendChild(cont);
+    const yGuardado = window.scrollY;
+    try {
+        window.scrollTo(0, 0);
+        await Promise.all([...cont.querySelectorAll('img')].map(im => im.complete ? Promise.resolve() : new Promise(res => { im.onload = res; im.onerror = res; })));
+        await new Promise(r => setTimeout(r, 150));
+        const ancho = Math.ceil(cont.offsetWidth);
+        const alto = Math.ceil(cont.offsetHeight);
+        const canvas = await html2canvas(cont, {
+            scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false,
+            width: ancho, height: alto, windowWidth: ancho, windowHeight: alto,
+            x: 0, y: 0, scrollX: 0, scrollY: 0
+        });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'in', format: 'letter', orientation: 'portrait' });
+        const PW = 8.5, PH = 11, mx = 0.3, mt = 0.35, mb = 0.6;
+        const anchoIn = PW - 2 * mx;
+        const pxPorIn = canvas.width / anchoIn;
+        const altoPagPx = (PH - mt - mb) * pxPorIn;
+        const escala = canvas.width / ancho;
+        const bounds = [...cont.querySelectorAll('.rep-sec')].map(el => ({ top: el.offsetTop * escala, bottom: (el.offsetTop + el.offsetHeight) * escala }));
+        let y = 0, pagina = 0;
+        while (y < canvas.height - 1) {
+            let limite = y + altoPagPx;
+            if (limite < canvas.height) {
+                const cruza = bounds.filter(b => b.top > y + 1 && b.top < limite && b.bottom > limite);
+                if (cruza.length) limite = Math.min(...cruza.map(b => b.top));
+            }
+            const corte = Math.max(1, Math.floor(Math.min(limite, canvas.height) - y));
+            const parte = document.createElement('canvas');
+            parte.width = canvas.width; parte.height = corte;
+            parte.getContext('2d').drawImage(canvas, 0, y, canvas.width, corte, 0, 0, canvas.width, corte);
+            if (pagina > 0) pdf.addPage();
+            pdf.addImage(parte.toDataURL('image/jpeg', 0.95), 'JPEG', mx, mt, anchoIn, corte / pxPorIn);
+            y += corte;
+            pagina++;
+        }
+        const total = pdf.internal.getNumberOfPages();
+        for (let i = 1; i <= total; i++) {
+            pdf.setPage(i);
+            pdf.setDrawColor(18, 216, 196);
+            pdf.setLineWidth(0.02);
+            pdf.line(mx, PH - 0.45, PW - mx, PH - 0.45);
+            pdf.setFontSize(8);
+            pdf.setTextColor(110);
+            pdf.text(JK_CFG.empresa + ' - Sistema JK - ' + JK_CFG.pieReportes, mx, PH - 0.3);
+            pdf.text('Página ' + i + ' de ' + total, PW - mx, PH - 0.3, { align: 'right' });
+        }
+        return pdf;
+    } finally {
+        cont.remove();
+        overlay.remove();
+        window.scrollTo(0, yGuardado);
+    }
+}
+function panelGenerarPDF(html, filename) {
+    return repCrearPDFCanvas(html)
+        .then(pdf => { pdf.save(filename); appCore.mostrarAvisoPDF(); })
+        .catch(e => { console.error(e); mostrarAlertaError('No se pudo generar el PDF.'); });
+}
+function repRenderPDF(html) { return repCrearPDFCanvas(html); }
+
+function contaReportePDFv2() {
+    if (!contaEstado.ultimo) { mostrarAlertaError('Primero carga la contabilidad.'); return; }
+    const { t, ops, egr, r } = contaEstado.ultimo;
+    const sesion = obtenerSesion() || {};
+    const periodo = contaTextoPeriodo(contaEstado.periodo, r);
+    const modo = contaEstado.hist;
+    const hist = contaHistoricoPeriodo(modo, r);
+    const fmtF = d => d ? new Date(d).toLocaleDateString('es-CO') : '—';
+    const colores = ['#0f766e', '#7c3aed', '#d97706', '#dc2626', '#0ea5e9', '#65a30d'];
+    const metodos = [
+        { label: 'Efectivo', value: t.efectivo, color: '#16a34a' },
+        { label: 'Pagos electrónicos (transferencia / tarjeta)', value: t.electronicos, color: '#2563eb' }
+    ];
+    const tipos = Object.keys(t.tipos).map((k, i) => ({ label: CONTA_LABEL_TIPO[k] || k, value: t.tipos[k], color: colores[i % colores.length] }));
+    const imgBalance = contaGraficoBalance(hist, (modo === 'dia' ? 'Balance diario' : 'Balance semanal') + ' · ' + periodo);
+    const imgMetodos = contaGraficoPie(metodos, 'Ingresos por método de pago');
+    const imgTipos = contaGraficoPie(tipos, 'Ingresos por tipo de operación');
+
+    let h = repMembrete('Reporte contable', periodo, [
+        ['Periodo', periodo],
+        ['Generado', new Date().toLocaleString('es-CO')],
+        ['Elaborado por', sesion.nombre || 'N/A']
+    ]);
+    h += `<div class="rep-sec"><h3>1. Indicadores clave</h3>${repKpis([
+        { lbl: 'Ingresos', val: contaFmt(t.ingresos), col: '#15803d' },
+        { lbl: 'Egresos', val: contaFmt(t.egresos), col: '#b91c1c' },
+        { lbl: 'Balance neto', val: contaFmt(t.balance), col: t.balance < 0 ? '#b91c1c' : '#0f766e' },
+        { lbl: 'Pagos electrónicos', val: contaFmt(t.electronicos), col: '#1d4ed8' },
+        { lbl: 'Efectivo recibido', val: contaFmt(t.efectivo), col: '#6d28d9' },
+        { lbl: 'Saldo por cobrar', val: contaFmt(t.pendiente), col: '#b45309' }
+    ])}</div>`;
+    h += `<div class="rep-sec"><h3>2. Histórico del balance (${modo === 'dia' ? 'por día' : 'por semana'})</h3><img class="rep-img" src="${imgBalance}" alt="Histórico del balance"></div>`;
+    h += `<div class="rep-sec"><h3>3. Distribución de ingresos</h3><img class="rep-img" src="${imgMetodos}" alt="Métodos de pago"><img class="rep-img" src="${imgTipos}" alt="Tipos de operación"></div>`;
+    h += `<div class="rep-sec"><h3>4. Estado de cuentas</h3>${repTabla(['Concepto', 'Valor'], [
+        ['Ingresos (abonos y pagos recibidos)', contaFmt(t.ingresos)],
+        ['(-) Egresos registrados', contaFmt(t.egresos)],
+        ['Balance neto del periodo', contaFmt(t.balance)],
+        ['Egresos pagados electrónicamente', contaFmt(t.egrElec)],
+        ['Número de operaciones', String(t.nOps)],
+        ['Número de egresos', String(t.nEgr)]
+    ], [1], 2)}</div>`;
+    h += `<div class="rep-sec"><h3>5. Ingresos por tipo de operación</h3>${repTabla(['Tipo', 'Ingresos'], tipos.map(x => [contaEsc(x.label), contaFmt(x.value)]), [1])}</div>`;
+    h += `<div class="rep-sec"><h3>6. Detalle del histórico</h3>${repTabla(['Periodo', 'Ingresos', 'Egresos', 'Electrónicos', 'Balance'],
+        hist.map(x => [contaEsc(x.etiqueta), contaFmt(x.ingresos), contaFmt(x.egresos), contaFmt(x.electronicos), contaFmt(x.balance)]), [1, 2, 3, 4])}</div>`;
+    h += `<div class="rep-sec"><h3>7. Operaciones (${Math.min(ops.length, 120)} de ${ops.length})</h3>${repTabla(
+        ['Fecha', 'Factura', 'Tipo', 'Cliente', 'Pago', 'Total', 'Pagado'],
+        ops.slice(0, 120).map(o => [fmtF(o.created_at), contaEsc(o.numero_factura || '—'), contaEsc(o.tipo_operacion), contaEsc(o.customer_name), contaEsc(o.payment_method), contaFmt(o.total), contaFmt(o.amount_paid)]),
+        [5, 6])}</div>`;
+    h += `<div class="rep-sec"><h3>8. Egresos (${Math.min(egr.length, 120)} de ${egr.length})</h3>${repTabla(
+        ['Fecha', 'Concepto', 'Categoría', 'Método', 'Monto'],
+        egr.slice(0, 120).map(e => [fmtF(e.fecha), contaEsc(e.concepto), contaEsc(e.categoria || '—'), contaEsc(e.metodo_pago || '—'), contaFmt(e.monto)]),
+        [4])}</div>`;
+    h += repCierre(repFirmas('Elaborado por<br>' + contaEsc(sesion.nombre || ''), 'Revisado / Gerencia<br>' + contaEsc(JK_CFG.empresa)));
+    panelGenerarPDF(h, `Reporte_Contable_JK_${contaHoyISO()}.pdf`);
+}
+
+// ---------- INICIO ----------
+cfgCargar();
 </script>
 </body>
 </html>
